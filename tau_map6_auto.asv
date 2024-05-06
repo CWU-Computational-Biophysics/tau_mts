@@ -317,7 +317,7 @@ mapplusendasym=mapfractip/mapfraclength;
 
 % export the workspace
 % define the export location
-export_dir = fullfile("raw_sim_data");
+export_dir = fullfile("sim_data");
 export_file = fullfile(export_dir, save_str);
 [~, ~, ~] = mkdir(export_dir);
 save(export_file, "-nocompression", "-v7");

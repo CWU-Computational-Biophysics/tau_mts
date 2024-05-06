@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,python,windows,venv,latex
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,visualstudiocode,python,windows,venv,latex
 
+### tau_mts ###
+# do not save simulation data
+raw_sim_data/
+
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:
 *.aux
