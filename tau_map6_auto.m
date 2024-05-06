@@ -3,7 +3,7 @@
 clear
 
 % define the name of the .mat file to save
-save_str = "T0_5";
+save_str = "T0_5_2";
 
 
 % Grid parameters
