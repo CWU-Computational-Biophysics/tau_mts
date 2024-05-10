@@ -7,7 +7,7 @@ save_str = "T0_5_2";
 
 
 % Grid parameters
-N=500; % Total number of time steps
+N=1000; % Total number of time steps
 M=20; % Number of spatial grid points
 dt=0.001; % Time step (s)
 L=20; % Domain length
