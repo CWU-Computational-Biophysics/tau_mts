@@ -4,6 +4,7 @@
 ### tau_mts ###
 # do not save simulation data
 raw_sim_data/
+data/
 
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:
@@ -322,7 +323,8 @@ TSWLatexianTemp*
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
