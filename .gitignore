@@ -3,8 +3,9 @@
 
 ### tau_mts ###
 # do not save simulation data
-raw_sim_data/
 data/
+frames/
+animations/
 
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:
