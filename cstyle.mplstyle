@@ -1,0 +1,55 @@
+# this style sheet defines "Calvin style" a purely subjective matplotlib style that I like best
+
+# font and render options
+font.family         : "serif"
+font.serif          : "Times"
+text.usetex         : True
+text.latex.preamble : \usepackage{amsmath}\usepackage{amssymb}\usepackage{bm}\usepackage{siunitx}\usepackage{esdiff}
+
+# text size options
+font.size       : 16
+axes.titlesize  : 16
+axes.labelsize  : 16
+xtick.labelsize : 14
+ytick.labelsize : 14
+legend.fontsize : 14
+
+# figure size options
+figure.figsize  : 8, 8
+
+# line width options
+lines.linewidth     : 1.5
+lines.markersize    : 8.0
+
+# legend options
+legend.frameon  : False
+
+# tick options
+xtick.major.width   : 1.25
+xtick.minor.width   : 1.25
+ytick.major.width   : 1.25
+ytick.minor.width   : 1.25
+
+# axes options
+axes.linewidth  : 1.25
+axes.prop_cycle : cycler('color', ['k'])
+axes.xmargin    : 0.0
+
+# save options
+savefig.dpi         : 300
+savefig.bbox        : "tight"
+savefig.transparent : True
+savefig.format      : "pdf"
+
+# set default colormap
+image.cmap      : viridis
+image.aspect    : equal
+
+# set date autoformatting see python 'datetime'
+#date.autoformatter.year        : %Y
+#date.autoformatter.month       : %Y-%m
+#date.autoformatter.day         : %Y-%m-%d
+#date.autoformatter.hour        : %m-%d %H
+#date.autoformatter.minute      : %d %H:%M
+#date.autoformatter.second      : %H:%M:%S
+#date.autoformatter.microsecond : %M:%S.%f

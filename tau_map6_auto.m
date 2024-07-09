@@ -3,7 +3,7 @@
 clear
 
 % define the name of the .mat file to save
-save_str = "const_dx_4";
+save_str = "50_false";
 
 
 % Grid parameters
@@ -31,9 +31,10 @@ MTlength(:,1)=t;
 MTlength(1,2)=L;
 MTlength(1,3)=growthstate;
 
+ratio = 50;
+tau_force = false;
+
 % Tunable parameters
-T0=5.0; %base binding rate for tau
-Toff=5.0; %undbinding rate for tau
 M0=0.1; %base binding rate for map6
 Moff=0.1; %unbinding rate for map6
 alphaT=0.0; % cooperativity for tau
@@ -42,6 +43,9 @@ alphaM=0.0; %cooperativity for map6
 %Minit=0.5; % initial fraction of binding sites on stable MT segment with map6 bound
 fmp=500; % rescue frequency
 fpm=300; % catastrophe frequency
+
+T0=ratio*M0; %base binding rate for tau
+Toff=T0; %undbinding rate for tau
 
 if (T0+M0)*dt>1MT
     'on rates too high'
@@ -217,7 +221,11 @@ for j=1:N-1 %loop over time
             % MTgrid=[MTgrid,zeros(N,1)];
             % MTgrid(1:j+1,M)=-1; % -1 means 'location does not exist at this time'
 			% growing with a tau pre-inserted
-            MTgrid(j+1,M)=1;
+            if tau_force
+				MTgrid(j+1,M)=1;
+			else
+				MTgrid(j+1,M)=0;
+			end
 
 			% check for new max M
 			if M > max_M
@@ -337,7 +345,7 @@ mapplusendasym=mapfractip/mapfraclength;
 
 % export the workspace
 % define the export location
-export_dir = fullfile("data/raw_sim_data");
+export_dir = fullfile("data/paper_data");
 export_file = fullfile(export_dir, save_str);
 [~, ~, ~] = mkdir(export_dir);
 save(export_file, "-nocompression", "-v7");
