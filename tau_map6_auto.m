@@ -12,6 +12,8 @@ M=20; % Number of spatial grid points
 dt=0.001; % Time step (s)
 L=20; % Domain length
 dx=L/(M-1); % Grid spacing (conceptualize as 36nm corresponding to length occupied by tau or map6)
+dx_vals=zeros(N,1);
+dx_vals(1,1)=dx;
 
 % Initialize variables. 
 MTgrid=zeros(N,M); % time, distance, Values: 0=empty, 1=tau, 2=map6
@@ -225,7 +227,7 @@ for j=1:N-1 %loop over time
 
             MTgrid(j+1,1:M-1)=MTgrid(j,1:M-1);
             MTgrid(j+1,M)=-1; % location no longer exists
-        end
+		end
 
 
 
@@ -238,6 +240,7 @@ for j=1:N-1 %loop over time
 
     MTlength(j+1,2)=L;
     MTlength(j+1,3)=growthstate;
+	dx_vals(j+1,1)=dx;
 end
 
 % figure
@@ -314,6 +317,15 @@ mapplusendasym=mapfractip/mapfraclength;
 % end
 % close(myVideo)
 % end
+
+% plot dx_vals
+figure
+plot(t', dx_vals')
+
+% plot with proportions
+figure
+% plot(t', dx_vals'./dx_vals(1,1), t', 1./(MTlength(:,2)./MTlength(1,2)))
+plot(t', dx_vals'./dx_vals(1,1), t', MTlength(:,2)./MTlength(1,2))
 
 % export the workspace
 % define the export location
