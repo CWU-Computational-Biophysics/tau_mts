@@ -3,12 +3,13 @@
 clear
 
 % define the name of the .mat file to save
-save_str = "T0_5_2";
+save_str = "const_dx_4";
 
 
 % Grid parameters
 N=1000; % Total number of time steps
 M=20; % Number of spatial grid points
+max_M = M;
 dt=0.001; % Time step (s)
 L=20; % Domain length
 dx=L/(M-1); % Grid spacing (conceptualize as 36nm corresponding to length occupied by tau or map6)
@@ -121,7 +122,7 @@ for j=1:N-1 %loop over time
        if(MTgrid(j,i)==0) % site un-occupied
            if rand<T0*dt % chance for tau binding
                MTgrid(j+1,i)=1; 
-           elseif T0*dt<rand<(T0+M0)*dt; % chance for map binding
+           elseif T0*dt<rand<(T0+M0)*dt % chance for map binding
                MTgrid(j+1,i)=2;
            else
                MTgrid(j+1,i)=0; % stays unoccupied
@@ -164,7 +165,7 @@ for j=1:N-1 %loop over time
     if(MTgrid(j,M)==0) % site un-occupied
         if rand<T0*dt % chance for tau binding
             MTgrid(j+1,M)=1; 
-        elseif T0*dt<rand<(T0+M0)*dt; % chance for map binding
+        elseif T0*dt<rand<(T0+M0)*dt % chance for map binding
             MTgrid(j+1,M)=2;
         else
             MTgrid(j+1,M)=0; % stays unoccupied
@@ -207,36 +208,40 @@ for j=1:N-1 %loop over time
         % enact growth or shrinking
 
         if growthstate==1 % growing
-         
             M=M+1;
             L=L+dx;
 
-            dx=L/(M-1); % Grid spacing (conceptualize as 36nm corresponding to length occupied by tau or map6)
+            % dx=L/(M-1); % Grid spacing (conceptualize as 36nm corresponding to length occupied by tau or map6)
             x=0:dx:L;
 
-            x=0:dx:L;
-
-            MTgrid=[MTgrid,zeros(N,1)];
-            MTgrid(1:j,M)=-1; % -1 means 'location does not exist at this time'
+            % MTgrid=[MTgrid,zeros(N,1)];
+            % MTgrid(1:j+1,M)=-1; % -1 means 'location does not exist at this time'
+			% growing with a tau pre-inserted
             MTgrid(j+1,M)=1;
 
+			% check for new max M
+			if M > max_M
+				max_M = M;
+				MTgrid(1:j, M) = -1;
+			end
+
         elseif growthstate==-1 % shrinking
-           % M=M-1;
+            M=M-1;
             L=L-dx;
-            %x=0:dx:L;
+            x=0:dx:L;
 
-            MTgrid(j+1,1:M-1)=MTgrid(j,1:M-1);
-            MTgrid(j+1,M)=-1; % location no longer exists
+            MTgrid(j+1,1:M)=MTgrid(j,1:M);
 		end
-
-
 
         %MTgrid(j+1,:)=[MTgrid(j,:),1];
        % MTgrid(j+1,1:M-1)=MTgrid(j,1:M-1);
        % MTgrid(j+1,M)=1; % new site has tau
     else 
         growthstate=0; %static
-    end
+	end
+
+	% ensure locations do not exist
+	MTgrid(j+1,M+1:max_M)=-1; % location does not exist
 
     MTlength(j+1,2)=L;
     MTlength(j+1,3)=growthstate;
@@ -319,13 +324,16 @@ mapplusendasym=mapfractip/mapfraclength;
 % end
 
 % plot dx_vals
-figure
-plot(t', dx_vals')
+% figure
+% plot(t', dx_vals')
 
 % plot with proportions
-figure
+% figure
+% plot(t', dx_vals'./dx_vals(1,1), t', MTlength(:,2)./MTlength(1,2))
+
+% plot with inverted proportions on the mt
+% figure
 % plot(t', dx_vals'./dx_vals(1,1), t', 1./(MTlength(:,2)./MTlength(1,2)))
-plot(t', dx_vals'./dx_vals(1,1), t', MTlength(:,2)./MTlength(1,2))
 
 % export the workspace
 % define the export location
