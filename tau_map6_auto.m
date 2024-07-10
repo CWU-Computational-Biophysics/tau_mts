@@ -3,7 +3,9 @@
 clear
 
 % define the name of the .mat file to save
-save_str = "50_false";
+save_str = "1_true";
+ratio = 1;
+tau_force = true;
 
 
 % Grid parameters
@@ -11,8 +13,12 @@ N=1000; % Total number of time steps
 M=20; % Number of spatial grid points
 max_M = M;
 dt=0.001; % Time step (s)
-L=20; % Domain length
-dx=L/(M-1); % Grid spacing (conceptualize as 36nm corresponding to length occupied by tau or map6)
+% L=20; % Domain length
+% dx=L/(M-1); % Grid spacing (conceptualize as 36nm corresponding to length occupied by tau or map6)
+% hardcode dx to 36nm = 0.036um
+dx=0.036;
+% initial MT length = dx*M
+L = dx*M;
 dx_vals=zeros(N,1);
 dx_vals(1,1)=dx;
 
@@ -30,9 +36,6 @@ MTlength=zeros(numel(t),3);
 MTlength(:,1)=t;
 MTlength(1,2)=L;
 MTlength(1,3)=growthstate;
-
-ratio = 50;
-tau_force = false;
 
 % Tunable parameters
 M0=0.1; %base binding rate for map6

@@ -1,7 +1,0 @@
-ratio,tau_force,sim_name
-1,true,"1_true.mat"
-1,false,"1_false.mat"
-10,true,"10_true.mat"
-10,false,"10_false.mat"
-50,true,"50_true.mat"
-50,false,"50_false.mat"
