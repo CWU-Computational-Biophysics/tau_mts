@@ -3,22 +3,24 @@
 clear
 
 % define the name of the .mat file to save
-save_str = "1_true";
-ratio = 1;
-tau_force = true;
+% save_str = "50_false";
+ratio = 50;
+tau_force = false;
 
+save_str = sprintf(ratio+"_"+tau_force);
+fprintf(save_str+" "+ratio+" "+tau_force)
 
 % Grid parameters
-N=1000; % Total number of time steps
+N=500; % Total number of time steps
 M=20; % Number of spatial grid points
 max_M = M;
-dt=0.001; % Time step (s)
+dt=0.1; % Time step (s)
 % L=20; % Domain length
 % dx=L/(M-1); % Grid spacing (conceptualize as 36nm corresponding to length occupied by tau or map6)
 % hardcode dx to 36nm = 0.036um
 dx=0.036;
 % initial MT length = dx*M
-L = dx*M;
+L=dx*M;
 dx_vals=zeros(N,1);
 dx_vals(1,1)=dx;
 
@@ -44,8 +46,8 @@ alphaT=0.0; % cooperativity for tau
 alphaM=0.0; %cooperativity for map6
 %Tinit=0.5; % initial fraction of binding sites on labile MT segment with tau bound
 %Minit=0.5; % initial fraction of binding sites on stable MT segment with map6 bound
-fmp=500; % rescue frequency
-fpm=300; % catastrophe frequency
+fmp=5; % rescue frequency
+fpm=3; % catastrophe frequency
 
 T0=ratio*M0; %base binding rate for tau
 Toff=T0; %undbinding rate for tau
