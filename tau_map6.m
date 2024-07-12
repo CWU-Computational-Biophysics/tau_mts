@@ -29,7 +29,8 @@ x = 0:grid_points;
 
 % initialize the MT grid
 % 0 = empty, 1 = tau, 2 = map6
-empty = 0;
-tau = 1;
-map6 = 2;
+nonexist = 0;
+empty = 1;
+tau = 2;
+map6 = 3;
 mt_grid = zeros(steps, grid_points);
