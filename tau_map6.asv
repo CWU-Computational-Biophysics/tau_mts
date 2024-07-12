@@ -1,0 +1,22 @@
+% tau_map6.m
+% Tau/Map6 project coarse grain model
+
+% define user-input simulation parameters
+% total simulation time [second]
+ttot = 50;
+% T0/M0 ratio [#]
+tau_map_ratio = 50;
+% force leading edge tau binding [bool]
+force_tau = false;
+
+% grid parameters
+% initial number of spatial grid points [#]
+grid_points = 20;
+% funamental unit of length [micrometer]
+x_scale = 0.036;
+
+% time parameters
+% time scale [second]
+dt = 0.001;
+% total number of time steps [#]
+steps = ttot/dt;
