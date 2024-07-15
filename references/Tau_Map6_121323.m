@@ -4,7 +4,7 @@
 clear
 
 % Grid parameters
-N=500; % Total number of time steps
+N=50000; % Total number of time steps
 M=20; % Number of spatial grid points
 dt=0.001; % Time step (s)
 L=20; % Domain length
@@ -237,16 +237,16 @@ for j=1:N-1 %loop over time
     MTlength(j+1,3)=growthstate;
 end
 
-figure
-bar(x',MTgrid(N,:))
+% figure
+% bar(x',MTgrid(N,:))
 
-figure
-plot(t',MTlength(:,2))
-title('MT length vs time')
+% figure
+% plot(t',MTlength(:,2))
+% title('MT length vs time')
 
-figure
-plot(t',MTlength(:,3))
-title('growth state vs time')
+% figure
+% plot(t',MTlength(:,3))
+% title('growth state vs time')
 
 % Calculate binding fraction asymmetry
 % defined as tau fraction, (tau/(tau+map6)), at plus end (final five
@@ -265,51 +265,51 @@ mapplusendasym=mapfractip/mapfraclength
 L
 
 
-figure
-fig = figure('units','inch','position',[10,10,15,4]);
-for i=1:M
-        if(MTgrid(N,i)==0) % nothing bound
-            bar(i,1,FaceColor="#77AC30")
-        elseif(MTgrid(N,i)==1) % tau bound
-           bar(i,1,FaceColor="#7E2F8E")
-        elseif(MTgrid(N,i)==2) % map6 bound
-            bar(i,1,FaceColor="#0072BD")
-        elseif(MTgrid(N,i)==-1) % no MT here
-            bar(i,1,'w',EdgeColor='w')
-        end
-        hold on
- end
+% figure
+% fig = figure('units','inch','position',[10,10,15,4]);
+% for i=1:M
+%         if(MTgrid(N,i)==0) % nothing bound
+%             bar(i,1,FaceColor="#77AC30")
+%         elseif(MTgrid(N,i)==1) % tau bound
+%            bar(i,1,FaceColor="#7E2F8E")
+%         elseif(MTgrid(N,i)==2) % map6 bound
+%             bar(i,1,FaceColor="#0072BD")
+%         elseif(MTgrid(N,i)==-1) % no MT here
+%             bar(i,1,'w',EdgeColor='w')
+%         end
+%         hold on
+%  end
 
 
-movie=1;
-if movie ==1
+% movie=1;
+% if movie ==1
 
 % Initialize video
-myVideo = VideoWriter('MT_tau_map6_121523'); %open video file (change file name to avoid overwriting)
-myVideo.FrameRate = 10;  %can adjust this, 5 - 10 works well for me
-open(myVideo)
-
-figure
-fig = figure('units','inch','position',[10,10,15,4]);
-for j=1:N
-    for i=1:M
-        if(MTgrid(j,i)==0) % nothing bound
-            bar(i,1,FaceColor="#77AC30")
-        elseif(MTgrid(j,i)==1) % tau bound
-           bar(i,1,FaceColor="#7E2F8E")
-        elseif(MTgrid(j,i)==2) % map6 bound
-            bar(i,1,FaceColor="#0072BD")
-        elseif(MTgrid(j,i)==-1) % no MT here
-            bar(i,1,'w',EdgeColor='w')
-        end
-        hold on
-    end
-    hold off
-    pause(0.1)
-    frame=getframe(gcf);
-    writeVideo(myVideo,frame);
-end
-close(myVideo)
-end
+% myVideo = VideoWriter('MT_tau_map6_121523'); %open video file (change file name to avoid overwriting)
+% myVideo.FrameRate = 10;  %can adjust this, 5 - 10 works well for me
+% open(myVideo)
+% 
+% figure
+% fig = figure('units','inch','position',[10,10,15,4]);
+% for j=1:N
+%     for i=1:M
+%         if(MTgrid(j,i)==0) % nothing bound
+%             bar(i,1,FaceColor="#77AC30")
+%         elseif(MTgrid(j,i)==1) % tau bound
+%            bar(i,1,FaceColor="#7E2F8E")
+%         elseif(MTgrid(j,i)==2) % map6 bound
+%             bar(i,1,FaceColor="#0072BD")
+%         elseif(MTgrid(j,i)==-1) % no MT here
+%             bar(i,1,'w',EdgeColor='w')
+%         end
+%         hold on
+%     end
+%     hold off
+%     pause(0.1)
+%     frame=getframe(gcf);
+%     writeVideo(myVideo,frame);
+% end
+% close(myVideo)
+% end
 
  
