@@ -5,7 +5,7 @@
 % total simulation time [second]
 ttot = 1;
 % T0/M0 ratio [#]
-tm_ratio = 50;
+tm_ratio = 1;
 % force leading edge tau binding [bool]
 t_force = true;
 % simulation save name
