@@ -36,17 +36,34 @@ def extract_mat_data(mat_file: PathLike, var_list: list = None) -> dict:
     if not mat_file.exists():
         raise FileNotFoundError(f"File '{mat_file}' does not exist.")
 
-    # read the .mat file and supress warnings
-    return_dict = {}
+    # initialize the dictionary
+    mat_file_path = Path(mat_file)
+    return_dict = {
+        "mat_file_path": mat_file_path,
+        "sim_name": mat_file_path.stem,
+    }
+
+    # define the mat_data keyword arguments
+    mat_data_kwargs = {
+        "file_name": mat_file,
+        "squeeze_me": True,
+        "variable_names": var_list
+    }
+
+    # read the .mat file to return dict and supress warnings
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore')
-        sio.loadmat(
-            file_name=mat_file,
-            mdict=return_dict,
-            squeeze_me=True,
-            variable_names=var_list)
+        sio.loadmat(mdict=return_dict, **mat_data_kwargs)
 
-    # extract variables
+    # load with proper dtyping for boolean checks
+    mat_dtype_data = sio.loadmat(mat_dtype=True, **mat_data_kwargs)
+
+    # check for booleans in mat_dtype_data and update the return dict value
+    for key, value in mat_dtype_data.items():
+        if isinstance(value, bool):
+            return_dict[key] = value
+
+    # return variables
     return return_dict
 
 
