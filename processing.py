@@ -132,6 +132,7 @@ def load_mat_dir(mat_dir: PathLike, var_list: list = None, rem_col_list: list = 
     mat_dir_path = Path(mat_dir)
     return_dict = {
         "mat_dir_path": mat_dir_path,
+        "sims": {}
     }
 
     # initialize the combined DataFrame
@@ -147,7 +148,7 @@ def load_mat_dir(mat_dir: PathLike, var_list: list = None, rem_col_list: list = 
 
         # add the DataFrame and array list to the combined DataFrame
         combined_df = pd.concat([combined_df, mat_df["df"]])
-        return_dict[mat_data["sim_name"]] =  {key:val for key, val in mat_df.items() if key != "df"}
+        return_dict["sims"][mat_data["sim_name"]] =  {key:val for key, val in mat_df.items() if key != "df"}
 
     # add the combined DataFrame to the return dictionary
     return_dict["df"] = combined_df
