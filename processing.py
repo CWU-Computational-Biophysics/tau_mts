@@ -154,8 +154,3 @@ def load_mat_dir(mat_dir: PathLike, var_list: list = None, rem_col_list: list = 
 
     # return the dictionary
     return return_dict
-
-
-# define a function to convert a simulation into multiple data frames
-a = load_mat_dir("data", DEF_VAR_LIST, DEF_REM_COL_LIST)
-print(a["df"])
