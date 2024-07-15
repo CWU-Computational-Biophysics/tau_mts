@@ -2,7 +2,6 @@
 # data processing for 'tau_map6.m' simulation '.mat' files
 
 # import packages
-import os
 import warnings
 from os import PathLike
 from pathlib import Path
@@ -11,9 +10,7 @@ import pandas as pd
 import numpy as np
 import scipy.io as sio
 
-from rich import print
-
-from configurations import DEF_VAR_LIST
+from configurations import DEF_VAR_LIST, DEF_REM_COL_LIST
 
 
 # define functions
@@ -67,5 +64,49 @@ def extract_mat_data(mat_file: PathLike, var_list: list = None) -> dict:
     return return_dict
 
 
+# define a function to convert the return dict to a df
+def mat_data_df(mat_dict: dict, rem_col_list: list = None) -> pd.DataFrame:
+    """ Converts a dictionary of variables and arrays from a .mat file to a pandas DataFrame.
+
+    Arguments:
+        mat_dict -- A dictionary of variables and arrays from a .mat file.
+
+    Keyword Arguments:
+        rem_col_list -- A list of columns to remove from the DataFrame. (default: None, remove no columns)
+
+    Returns:
+        pd.DataFrame: A pandas DataFrame of the variables.
+    """
+
+    # seperate the dictionary into an array dictionary and variable dictionary
+    array_dict = {}
+    var_dict = {}
+    for key, value in mat_dict.items():
+        # skip keys for faster loading
+        if key in rem_col_list: continue
+
+        # keep in the array dict if an array or string
+        if isinstance(value, (np.ndarray, str, PathLike)):
+            array_dict[key] = value
+        else:
+            var_dict[key] = [value]
+
+    # convert the var dict into a dataframe
+    # the keys should be columns
+    var_df = pd.DataFrame(var_dict)
+
+    # set the index to the sim_name from the dictionary
+    var_df["sim_name"] = mat_dict["sim_name"]
+    var_df.set_index("sim_name", inplace=True)
+
+    # save the df to the array dict under "df"
+    array_dict["df"] = var_df
+
+    # return the array dict
+    return array_dict
+
+
 # define a function to convert a simulation into multiple data frames
-print(extract_mat_data(Path("data/taumap6_2024Jul15-104243.mat"), DEF_VAR_LIST))
+a = extract_mat_data(Path("data/taumap6_2024Jul15-104243.mat"), DEF_VAR_LIST)
+b = mat_data_df(a, DEF_REM_COL_LIST)
+print(b["df"])
