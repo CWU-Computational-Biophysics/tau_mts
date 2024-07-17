@@ -62,8 +62,9 @@ frame_rate = 30
 anim_time = 10
 full_frame_rate = 50
 
-# # generate animations
-for sim_name in data_dict["sims"].keys():
+# generate animations
+sim_names = list(data_dict["sims"].keys())
+for sim_name in sim_names:
     # make a low res animation
     create_protein_animation(
         save_path=ANIMATION_DIR / f"{sim_name}_animation_proteins.mp4",
