@@ -139,13 +139,9 @@ for step_i = 1:(steps-1)
 	growth_state = mt_length(step_i, 2);
 
 	% dynamic MTs when tau bound in last three sites
-	tau_sum = 0;
-	if grid_points >= 3
-		tau_grid = mt_grid(step_i, (grid_points-2):grid_points)==state_tau;
-		tau_sum = sum(tau_grid);
-	end
-
-	if tau_sum > 0
+	
+	tau_grid = mt_grid(step_i, (grid_points-2):grid_points)==state_tau;
+	if sum(tau_grid) > 0
 		% chance to change growth state
 		if growth_state == state_static
 			growth_state = state_growing;
@@ -200,17 +196,12 @@ for step_i = 1:(steps-1)
 	% pass on grid point count and growth state
 	mt_length(step_i+1, 1) = grid_points;
 	mt_length(step_i+1, 2) = growth_state;
-
-	% check for MT death
-	if grid_points == 0
-		break
-	end
 end
 
 
 % get array states
 final_n = 10;
-if grid_points > final_n
+if numel(mt_grid(end, :)) > final_n
 	tip_array = mt_grid(end, (grid_points-final_n):grid_points);
 	length_array = mt_grid(end, 1:(grid_points-(final_n+1)));
 
