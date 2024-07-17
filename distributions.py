@@ -283,12 +283,12 @@ def plot_clusters(
     if protein_points_size != 0:
         ax.legend(
             [tau_label, tau_dot, map6_label, map6_dot],
-            ["Tau Cluster", "Tau Protein", "Map6 Cluster", "Map6 Protein"],
+            ["Tau Cluster", "Tau", "MAP6 Cluster", "MAP6"],
             loc=legend_loc)
     else:
         ax.legend(
             [tau_label, map6_label],
-            ["Tau Sequence", "Map6 Sequence"],
+            ["Tau Sequence", "MAP6 Sequence"],
             loc=legend_loc)
 
 
