@@ -12,7 +12,10 @@ t_on = tm_ratio * m_on;
 % unbinding rate for tau [1/second] (Toff)
 t_off = t_on;
 % total number of time steps [#] (N)
-steps = (ttot/dt) + 1;
+time_scale = 10;
+ttot_prime = ttot/time_scale;
+steps = (ttot_prime/dt) + 1;
+time = (dt*time_scale) .* (1:steps);
 
 % initialize the MT grid array (MTgrid)
 mt_grid = ones(steps, grid_points_init);

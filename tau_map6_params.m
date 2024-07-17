@@ -19,18 +19,18 @@ grid_points_init = 20;
 % funamental unit of length [micrometer] (dx=0.036)
 dx = 0.036;
 % time scale [second] (dt=0.001)
-dt = 0.1;
+dt = 0.001;
 
 % tunable parameters
 % base binding rate for map6 [1/second] (M0=0.1)
-m_on = 0.001;
+m_on = 0.1;
 % unbinding rate for map6 [1/second] (Moff=0.1)
-m_off = 0.001;
+m_off = 0.1;
 % cooperativity for tau [ ] (alphaT=0.0)
 alpha_t = 0.0;
 % cooperativity for map6 [ ] (alphaM=0.0)
 alpha_m = 0.0;
 % rescue frequency [1/second] (fmp=500)
-f_res = 0.5;
+f_res = 500;
 % catastrophe frequency [1/second] (fpm=300)
-f_cat = 0.3;
+f_cat = 300;

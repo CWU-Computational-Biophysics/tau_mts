@@ -30,9 +30,7 @@ def extract_distribution(sim_name: str, time_step: int, data_dict: dict) -> tupl
     """
 
     # extract time information
-    dt = data_dict["df"].loc[sim_name]["dt"]
-    ttot = data_dict["df"].loc[sim_name]["ttot"]
-    time_list = np.arange(0, ttot+dt, dt)
+    time_list = data_dict["sims"][sim_name]["time"]
 
     # extract spatial information
     dx = data_dict["df"].loc[sim_name]["dx"]
@@ -147,7 +145,7 @@ def plot_clusters(
     """
 
     # extract the distribution information
-    _, length_value, length_units, mt_state_array, grid_spacing = extract_distribution(sim_name, time_step, data_dict)
+    _, length_value, _, mt_state_array, grid_spacing = extract_distribution(sim_name, time_step, data_dict)
 
     # extract the sequence information
     # this was previously called the domain information
@@ -298,7 +296,7 @@ def plot_clusters(
 def create_protein_animation(
     save_path: PathLike,
     sim_name: str,
-    sim_dict: dict,
+    data_dict: dict,
     frame_rate: int = 60,
     anim_time: int = 10,
     overwrite: bool = False,
@@ -333,26 +331,24 @@ def create_protein_animation(
         raise FileExistsError(f"File '{save_path}' already exists. Set 'overwrite=True' to overwrite the file.")
 
     # check that the sim dict has sims as a key
-    if "sims" not in sim_dict.keys():
+    if "sims" not in data_dict.keys():
         raise ValueError("The sim_dict must have a 'sims' key.")
 
     # validate the sim name
-    if sim_name not in sim_dict["sims"].keys():
-        raise ValueError(f"Simulation '{sim_name}' not found in sim_dict. Available simulations: {list(sim_dict['sims'].keys())}.")
+    if sim_name not in data_dict["sims"].keys():
+        raise ValueError(f"Simulation '{sim_name}' not found in sim_dict. Available simulations: {list(data_dict['sims'].keys())}.")
 
     # get the frame count
     frame_count = anim_time * frame_rate
 
     # get time step information
-    max_time_step = sim_dict["df"].loc[sim_name]["steps"]
+    max_time_step = data_dict["df"].loc[sim_name]["steps"]
     time_steps = np.linspace(0, max_time_step-1, frame_count, dtype=int)
-    dt = sim_dict["df"].loc[sim_name]["dt"]
-    ttot = sim_dict["df"].loc[sim_name]["ttot"]
-    time_list = np.arange(0, ttot+dt, dt)
+    time_list = data_dict["sims"][sim_name]["time"]
 
     # generate an animation from the frames
     # get the max mt length for the simulation
-    max_mt_length = sim_dict["df"].loc[sim_name]["final_length"]
+    max_mt_length = data_dict["df"].loc[sim_name]["final_length"]
 
     # get the largest cluster size
     # iterate over each time step and extract sequence information
@@ -360,7 +356,7 @@ def create_protein_animation(
     max_protein_count = 0
     if override_yaxis:
         for time_step in time_steps:
-            sequence_df = extract_sequences(sim_name, time_step, sim_dict)
+            sequence_df = extract_sequences(sim_name, time_step, data_dict)
             max_protein_count = max(max_protein_count, sequence_df["num_proteins"].max())
 
     # if the max_protein_count is 0 then set it to none to let the drawing function handle it
@@ -378,7 +374,7 @@ def create_protein_animation(
         plot_clusters(
             fig, ax,
             sim_name=sim_name,
-            data_dict=sim_dict,
+            data_dict=data_dict,
             time_step=time_steps[i],
             protein_points_size=protein_points_size,
             binding_ticks=binding_ticks,
