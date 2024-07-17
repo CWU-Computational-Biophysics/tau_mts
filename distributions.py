@@ -16,10 +16,9 @@ from matplotlib.animation import FuncAnimation
 from tqdm import tqdm
 
 
-# define a function to extract the distribution information
-# should take inputs of sim_name, time step, and sim dict
-def extract_distribution(sim_name: str, time_step: int, data_dict: dict):
-    """Extracts the distribution information from a simulation
+# define a function to extract distribution information
+def extract_distribution(sim_name: str, time_step: int, data_dict: dict) -> tuple:
+    """ Extracts the distribution information from a simulation at a given time step.
 
     Arguments:
         sim_name {str} -- sim_name of the simulation in the data_dict
@@ -27,44 +26,36 @@ def extract_distribution(sim_name: str, time_step: int, data_dict: dict):
         data_dict {dict} -- dictionary of simulation data
 
     Returns:
-        tuple -- (time, length, mt_state_array, grid_spacing)
+        tuple -- tuple of time_list, length_value, length_units, mt_state, dx
     """
 
-    # extract some values
+    # extract time information
     dt = data_dict["df"].loc[sim_name]["dt"]
     ttot = data_dict["df"].loc[sim_name]["ttot"]
-    time_list = np.arange(0, ttot, dt)
+    time_list = np.arange(0, ttot+dt, dt)
+
+    # extract spatial information
     dx = data_dict["df"].loc[sim_name]["dx"]
-    length_value_units = data_dict["sims"][sim_name]["mt_length"][time_step][0]
-    length_value = length_value_units * dx
+    length_units = data_dict["sims"][sim_name]["mt_length"][time_step][0]
+    length_value = length_units * dx
 
-    # get that row of mt_grid
+    # get this row of the mt_grid
     mt_state = data_dict["sims"][sim_name]["mt_grid"][time_step]
+    mt_state = mt_state[0:length_units]
 
-    # get the first index of -1 from mt_state, then remove all entries beyond
-    # consider that there may be no entries of -1
-    try:
-        minus_one_index = np.where(mt_state == -1)[0][0]
-        mt_state = mt_state[:minus_one_index]
-    except IndexError:
-        pass
+    # calculate grid positions
+    # these are the positions of the left edges and the right edge
+    grid_left_edge = np.arange(0, length_units) * dx
 
-    # calculate grid information
-    binding_sites = len(mt_state)
-    grid_spacing = length_value / (binding_sites - 1)
-    grid_positions = np.linspace(0, length_value, binding_sites)
+    # join grid positions and mt state as columns in np array
+    mt_state = np.column_stack((grid_left_edge, mt_state))
 
-    # join grid_positions and mt_state as columns in a np array
-    mt_state_array = np.column_stack((grid_positions, mt_state))
-
-    # return
-    return time_list, length_value, mt_state_array, grid_spacing
+    return time_list, length_value, length_units, mt_state, dx
 
 
-# define a function to extract the domain information
-# function should call extract_distribution
-def extract_sequences(sim_name: str, time_step: int, data_dict: dict):
-    """Extracts the sequence information from a simulation
+# define a function to extract sequences
+def extract_sequences(sim_name: str, time_step: int, data_dict: dict) -> pd.DataFrame:
+    """ Extracts the protein sequences from a simulation at a given time step.
 
     Arguments:
         sim_name {str} -- sim_name of the simulation in the data_dict
@@ -72,11 +63,12 @@ def extract_sequences(sim_name: str, time_step: int, data_dict: dict):
         data_dict {dict} -- dictionary of simulation data
 
     Returns:
-        pd.DataFrame -- dataframe of sequence information
+        pd.DataFrame -- DataFrame of the protein sequences
+
     """
 
     # extract the distribution information
-    _, _, mt_state_array, _ = extract_distribution(sim_name, time_step, data_dict)
+    _, _, _, mt_state_array, _ = extract_distribution(sim_name, time_step, data_dict)
 
     # define the sequence dictionary
     sequence_dict = {
@@ -121,11 +113,7 @@ def extract_sequences(sim_name: str, time_step: int, data_dict: dict):
     return sequence_df
 
 
-# define a function to plot groups based on clusters
-# should take input of fig, ax
-# should not save the plot
-# should take optional input of a color list
-# should call extract_distribution and extract_sequence as needed
+# define a function to plot clusters
 def plot_clusters(
     fig, ax,
     sim_name: str,
@@ -159,7 +147,7 @@ def plot_clusters(
     """
 
     # extract the distribution information
-    _, length_value, mt_state_array, grid_spacing = extract_distribution(sim_name, time_step, data_dict)
+    _, length_value, length_units, mt_state_array, grid_spacing = extract_distribution(sim_name, time_step, data_dict)
 
     # extract the sequence information
     # this was previously called the domain information
@@ -352,10 +340,10 @@ def create_protein_animation(
 
     # get time step information
     max_time_step = sim_dict["df"].loc[sim_name]["steps"]
-    time_steps = np.linspace(1, max_time_step-1, frame_count, dtype=int)
+    time_steps = np.linspace(0, max_time_step-1, frame_count, dtype=int)
     dt = sim_dict["df"].loc[sim_name]["dt"]
     ttot = sim_dict["df"].loc[sim_name]["ttot"]
-    time_list = np.arange(0, ttot, dt)
+    time_list = np.arange(0, ttot+dt, dt)
 
     # generate an animation from the frames
     # get the max mt length for the simulation

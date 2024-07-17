@@ -2,8 +2,8 @@
 % Tau/Map6 project coarse grain model
 
 % load user-input parameters
-clear;
-tau_map6_params;
+% clear;
+% tau_map6_params;
 % tau_map6_params_default;
 
 % calculated parameters
@@ -12,7 +12,7 @@ t_on = tm_ratio * m_on;
 % unbinding rate for tau [1/second] (Toff)
 t_off = t_on;
 % total number of time steps [#] (N)
-steps = ttot/dt;
+steps = (ttot/dt) + 1;
 
 % initialize the MT grid array (MTgrid)
 mt_grid = ones(steps, grid_points_init);
@@ -162,7 +162,7 @@ for step_i = 1:(steps-1)
 	if growth_state == state_growing
 		% increase the number of rows
 		% first define a new column of the not exist state
-		new_col = ones(steps+1, 1);
+		new_col = ones(steps, 1);
 		new_col = new_col .* state_empty;
 		
 		% append the column to the array

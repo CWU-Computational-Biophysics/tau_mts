@@ -1,0 +1,19 @@
+% tau_map6_run.m
+% a standard script for sweeping parameters
+
+% iterate over t_force values
+for i = [1, 5, 10, 50]
+	tau_map6_params;
+	tm_ratio = i;
+	t_force = true;
+	ttot = 50;
+	sim_name = sprintf("taumap6_" + tm_ratio + "_" + t_force);
+	tau_map6;
+
+	tau_map6_params;
+	tm_ratio = i;
+	t_force = true;
+	ttot = 50;
+	sim_name = sprintf("taumap6_" + tm_ratio + "_" + t_force);
+	tau_map6;
+end
