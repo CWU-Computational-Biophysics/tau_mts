@@ -228,7 +228,8 @@ tau_ratio_dict = {}
 # iterate over each simulation in sim_dict and get the time and length array
 sim_names = list(data_dict["sims"].keys())
 sim_names.sort(key=lambda x: data_dict["df"].loc[x]["tm_ratio"])
-for index, sim_name in enumerate(sim_names):
+color_index = 0
+for sim_name in sim_names:
     # get the arrays
     mt_length_array = data_dict["sims"][sim_name]["mt_length"]
     length_list = mt_length_array[:, 0]
@@ -247,7 +248,8 @@ for index, sim_name in enumerate(sim_names):
     # get a unique color for each tau ratio
     # if the color has been used, make the label None
     if tau_ratio not in tau_ratio_dict.keys():
-        tau_ratio_dict[tau_ratio] = DEFAULT_COLORMAP[index]
+        tau_ratio_dict[tau_ratio] = DEFAULT_COLORMAP[color_index]
+        color_index += 1
     else:
         label = None
 
