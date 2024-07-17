@@ -12,10 +12,11 @@ t_on = tm_ratio * m_on;
 % unbinding rate for tau [1/second] (Toff)
 t_off = t_on;
 % total number of time steps [#] (N)
-time_scale = 10;
-ttot_prime = ttot/time_scale;
-steps = (ttot_prime/dt) + 1;
-time = (dt*time_scale) .* (1:steps);
+% time_scale = 10;
+% ttot_prime = ttot/time_scale;
+steps = (ttot/dt) + 1;
+% time = (dt*time_scale) .* (1:steps);
+time = dt .* (1:steps);
 
 % initialize the MT grid array (MTgrid)
 mt_grid = ones(steps, grid_points_init);
@@ -230,4 +231,4 @@ end
 export_file = fullfile(export_dir, sim_name);
 [~, ~, ~] = mkdir(export_dir);
 save(export_file, "-nocompression", "-v7");
-fprintf("sim saved @ '" + export_file + "'.\n");
+fprintf("sim saved @ '" + export_file + "'.\n\n");
