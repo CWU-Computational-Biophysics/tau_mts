@@ -10,8 +10,6 @@ import pandas as pd
 import numpy as np
 import scipy.io as sio
 
-from configurations import DEF_VAR_LIST, DEF_REM_COL_LIST
-
 
 # define functions
 # define a function to extract data from a .mat file
