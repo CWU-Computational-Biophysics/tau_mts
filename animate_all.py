@@ -15,8 +15,11 @@ from processing import load_mat_dir
 from distributions import create_protein_animation
 
 
-# define the data directory
-DATA_DIR = Path("data", "paper_50_true")
+# get the data directory from the user
+user_input = input("Enter the data directory: ")
+DATA_DIR = Path(user_input)
+if not os.path.isdir(user_input):
+    raise ValueError("Invalid data directory")
 
 # configure the figure save directory
 FIGURE_DIR = Path("figures", DATA_DIR.parts[-1])
