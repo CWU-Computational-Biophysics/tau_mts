@@ -239,10 +239,15 @@ def plot_clusters(
     # the vertical bars should be centered on y=0
     # they vertical bars should extend vertically just a small amount
     if binding_ticks:
+        # define the tick height
+        height = 2 * ax.get_ylim()[0] / 100
+
+        # draw a tick at the left edge of each binding site
         for pos in mt_state_array[:, 0]:
-            # scale the height by the y-axis limit
-            height = 2 * ax.get_ylim()[0] / 100
             ax.vlines(pos, -height, height, color="black")
+
+        # draw one more at the end (at pos + grid_spacing)
+        ax.vlines(pos + grid_spacing, -height, height, color="black")
 
     # set the xlim to (0, mt length at current time)
     ax.set_xlim(0, length_value)
