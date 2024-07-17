@@ -33,11 +33,6 @@ mt_grid(1, 1:grid_points_init) = state_empty;
 % initialize the MT length array (MTlength)
 % 1: length [#],
 % 2: growthstate [#],
-% 3: taufractip [#],
-% 4: taufraclength [#],
-% 5: tauplusendasym [#],
-% 6: mapfractip [#],
-% 7: mapplusendasym [#]
 mt_length = zeros(steps, 2);
 mt_length(1,1) = grid_points_init;
 % relate the growth state to an integer
