@@ -23,9 +23,9 @@ dt = 0.01;
 
 % tunable parameters
 % base binding rate for map6 [1/second] (M0=0.1)
-m_on = 0.01;
+m_on = 1;
 % unbinding rate for map6 [1/second] (Moff=0.1)
-m_off = 0.01;
+m_off = 1;
 % cooperativity for tau [ ] (alphaT=0.0)
 alpha_t = 0.0;
 % cooperativity for map6 [ ] (alphaM=0.0)

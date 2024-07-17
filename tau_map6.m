@@ -12,10 +12,7 @@ t_on = tm_ratio * m_on;
 % unbinding rate for tau [1/second] (Toff)
 t_off = t_on;
 % total number of time steps [#] (N)
-% time_scale = 10;
-% ttot_prime = ttot/time_scale;
 steps = (ttot/dt) + 1;
-% time = (dt*time_scale) .* (1:steps);
 time = dt .* (1:steps);
 
 % initialize the MT grid array (MTgrid)
@@ -31,8 +28,7 @@ mt_grid = mt_grid .* state_notexist;
 mt_grid(1, 1:grid_points_init) = state_empty;
 
 % initialize the MT length array (MTlength)
-% 1: length [#],
-% 2: growthstate [#],
+% 1: length [#], 2: growthstate [#]
 mt_length = zeros(steps, 2);
 mt_length(1,1) = grid_points_init;
 % relate the growth state to an integer
