@@ -13,6 +13,7 @@ from matplotlib import colormaps
 # import modules
 from configurations import DEF_VAR_LIST, DEF_REM_COL_LIST, CSTYLE_FILE_STR
 from processing import load_mat_dir
+from distributions import create_protein_animation
 
 
 # define the data directory
