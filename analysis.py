@@ -127,7 +127,7 @@ fig.savefig(FIGURE_DIR / r"growth_effect")
 # ### Plot Binding Asymmetry
 
 # %%
-data_avg_df
+# data_avg_df
 
 # %%
 # make a grouped bar plot of binding asymmetry
@@ -279,7 +279,7 @@ fig.savefig(FIGURE_DIR / r"mt_growth_over_time")
 # ## Plot Clusters
 
 # %%
-print_options()
+# print_options()
 
 # %%
 # define the name of the sim to plot
