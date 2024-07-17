@@ -15,7 +15,7 @@ t_off = t_on;
 steps = ttot/dt;
 
 % initialize the MT grid array (MTgrid)
-mt_grid = ones(steps+1, grid_points_init);
+mt_grid = ones(steps, grid_points_init);
 % relate the grid state to an integer
 state_notexist = -1;
 state_empty = 0;
@@ -34,7 +34,7 @@ mt_grid(1, 1:grid_points_init) = state_empty;
 % 5: tauplusendasym [#],
 % 6: mapfractip [#],
 % 7: mapplusendasym [#]
-mt_length = zeros(steps+1, 2);
+mt_length = zeros(steps, 2);
 mt_length(1,1) = grid_points_init;
 % relate the growth state to an integer
 state_static = 0;
@@ -51,7 +51,7 @@ fprintf("sim time: " + ttot + " seconds\n");
 
 % simulation begin
 % for loop over time
-for step_i = 1:steps
+for step_i = 1:(steps-1)
 	% get the current number of grid points
 	[~, grid_points] = find(mt_grid(step_i, :)==state_notexist, 1);
 
