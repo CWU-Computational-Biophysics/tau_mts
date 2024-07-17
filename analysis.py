@@ -285,17 +285,18 @@ fig.savefig(FIGURE_DIR / r"mt_growth_over_time")
 # define the name of the sim to plot
 sim_name = list(data_dict["sims"].keys())[0]
 time_step = -1
-print(f"Plotting '{sim_name}' / {list(data_dict['sims'].keys())}.")
+# print(f"Plotting '{sim_name}' / {list(data_dict['sims'].keys())}.")
 
 # %%
-# plot the protein cluster distribution using the function
-# define the figure
-fig, ax = plt.subplots(figsize=(16, 9))
+for sim_name in list(data_dict["sims"].keys()):
+    # plot the protein cluster distribution using the function
+    # define the figure
+    fig, ax = plt.subplots(figsize=(16, 9))
 
-plot_clusters(fig, ax, sim_name, data_dict, 10, binding_ticks=True)
+    plot_clusters(fig, ax, sim_name, data_dict, -1, binding_ticks=True)
 
-# save the figure
-fig.savefig(FIGURE_DIR / f"{sim_name}_protein_cluster_distribution")
+    # save the figure
+    fig.savefig(FIGURE_DIR / f"{sim_name}_protein_cluster_distribution")
 
 # %% [markdown]
 # ## Animate Clusters

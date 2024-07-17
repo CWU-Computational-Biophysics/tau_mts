@@ -4,7 +4,7 @@
 % iterate over parameter sets
 for i = [1, 5, 10, 50]
 	for j = [true, false]
-		for k = [1, 2, 3]
+		for k = [1,]
 			% load params
 			tau_map6_params;
 
