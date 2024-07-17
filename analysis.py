@@ -323,14 +323,14 @@ for sim_name in data_dict["sims"].keys():
     # make a full res animation that shows each time step
     # run this animation at 50 fps
     # get the number of time steps
-    time_steps = data_dict["df"].loc[sim_name]["steps"]
-    full_anim_time = int(time_steps / full_frame_rate)
-    create_protein_animation(
-        save_path=ANIMATION_DIR / f"{sim_name}_animation_proteins_full.mp4",
-        sim_name=sim_name,
-        sim_dict=data_dict,
-        frame_rate=full_frame_rate,
-        anim_time=full_anim_time,
-        overwrite=True,
-        protein_points_size=30,
-        binding_ticks=True)
+    # time_steps = data_dict["df"].loc[sim_name]["steps"]
+    # full_anim_time = int(time_steps / full_frame_rate)
+    # create_protein_animation(
+    #     save_path=ANIMATION_DIR / f"{sim_name}_animation_proteins_full.mp4",
+    #     sim_name=sim_name,
+    #     sim_dict=data_dict,
+    #     frame_rate=full_frame_rate,
+    #     anim_time=full_anim_time,
+    #     overwrite=True,
+    #     protein_points_size=30,
+    #     binding_ticks=True)
