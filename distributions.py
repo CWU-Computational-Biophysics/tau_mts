@@ -333,7 +333,7 @@ def create_protein_animation(
 
     # validate the sim name
     if sim_name not in sim_dict["sims"].keys():
-        raise ValueError(f"Simulation '{sim_name}' not found in sim_dict. Available simulations: {list(sim_dict.keys())}.")
+        raise ValueError(f"Simulation '{sim_name}' not found in sim_dict. Available simulations: {list(sim_dict['sims'].keys())}.")
 
     # get the frame count
     frame_count = anim_time * frame_rate
