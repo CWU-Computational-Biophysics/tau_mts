@@ -8,6 +8,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib import colormaps
+from rich import print
 
 # import modules
 from configurations import DEF_VAR_LIST, DEF_REM_COL_LIST, CSTYLE_FILE_STR
@@ -17,16 +18,17 @@ from distributions import create_protein_animation
 
 # get the data directory from the user
 user_input = input("Enter the data directory: ")
-DATA_DIR = Path(user_input)
+data_dir = Path(user_input)
 if not os.path.isdir(user_input):
     raise ValueError("Invalid data directory")
+print(f"Data directory set to '{data_dir}'.")
 
 # configure the figure save directory
-FIGURE_DIR = Path("figures", DATA_DIR.parts[-1])
+FIGURE_DIR = Path("figures", data_dir.parts[-1])
 os.makedirs(FIGURE_DIR, exist_ok=True)
 
 # configure the animation save directory
-ANIMATION_DIR = Path("animations", DATA_DIR.parts[-1])
+ANIMATION_DIR = Path("animations", data_dir.parts[-1])
 os.makedirs(ANIMATION_DIR, exist_ok=True)
 
 # set plotting style
@@ -38,7 +40,7 @@ DEFAULT_COLORMAP = list(colormaps["tab10"].colors)
 
 # import the data dictionary
 # get the data dictionary from the data directory
-data_dict = load_mat_dir(DATA_DIR, DEF_VAR_LIST, DEF_REM_COL_LIST)
+data_dict = load_mat_dir(data_dir, DEF_VAR_LIST, DEF_REM_COL_LIST)
 
 
 # add some calculations
@@ -70,14 +72,14 @@ sim_names = list(data_dict["sims"].keys())
 for sim_name in sim_names:
     # make a low res animation
     create_protein_animation(
-        save_path=ANIMATION_DIR / f"{sim_name}_animation_proteins.mp4",
+        save_path=ANIMATION_DIR / f"{sim_name}.mp4",
         sim_name=sim_name,
         data_dict=data_dict,
         frame_rate=frame_rate,
         anim_time=anim_time,
         overwrite=True,
-        protein_points_size=30,
-        binding_ticks=True)
+        protein_points_size=0,
+        binding_ticks=False)
 
     # make a full res animation that shows each time step
     # get the number of time steps
@@ -86,11 +88,11 @@ for sim_name in sim_names:
 
     # make the high rest animation
     create_protein_animation(
-        save_path=ANIMATION_DIR / f"{sim_name}_animation_proteins_full.mp4",
+        save_path=ANIMATION_DIR / f"{sim_name}_full.mp4",
         sim_name=sim_name,
         data_dict=data_dict,
         frame_rate=full_frame_rate,
         anim_time=full_anim_time,
         overwrite=True,
-        protein_points_size=30,
-        binding_ticks=True)
+        protein_points_size=0,
+        binding_ticks=False)

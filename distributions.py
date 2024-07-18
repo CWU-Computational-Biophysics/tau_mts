@@ -194,17 +194,22 @@ def plot_clusters(
             zorder=0,
         )
 
+    # get the states
+    state_tau = data_dict["df"].loc[sim_name]["state_tau"]
+    state_map6 = data_dict["df"].loc[sim_name]["state_map6"]
+    state_empty = data_dict["df"].loc[sim_name]["state_empty"]
+
     # plot each protein on the horizontal if protein points
     if protein_points_size != 0:
         for (pos, protein) in mt_state_array:
             # protein = 1 means tau
             # protein = 2 means map6
             # check that the protein value is not 0
-            if protein == 0: continue
+            if protein == state_empty: continue
 
             # use the protein value to determine the color
-            if protein == 1: color = tau_color
-            elif protein == 2: color = map6_color
+            if protein == state_tau: color = tau_color
+            elif protein == state_map6: color = map6_color
 
             # plot the protein as a dot with a black outline
             protein_pos = pos + grid_spacing/2
