@@ -2,8 +2,8 @@
 % Tau/Map6 project coarse grain model
 
 % load user-input parameters
-clear;
-tau_map6_params;
+% clear;
+% tau_map6_params;
 
 % calculated parameters
 % base binding rate for tau [1/second] (T0)

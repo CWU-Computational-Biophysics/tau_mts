@@ -159,18 +159,24 @@ def plot_clusters(
     tau_color = colors[0]
     map6_color = colors[1]
 
+    # get the state integers
+    state_tau = data_dict["df"].loc[sim_name]["state_tau"]
+    state_map6 = data_dict["df"].loc[sim_name]["state_map6"]
+    state_empty = data_dict["df"].loc[sim_name]["state_empty"]
+    # state_notexist = data_dict["df"].loc[sim_name]["state_notexist"]
+
     # use the sequence_df to plot the sequence information
     for (_, start_pos, width, end_pos, center_pos, num_proteins, protein_type) in sequence_df.itertuples():
         # skip protein_type 0
-        if protein_type == 0: continue
+        if protein_type == state_empty: continue
 
         # use the protein type to determine the color
-        if protein_type == 1: color = tau_color
-        elif protein_type == 2: color = map6_color
+        if protein_type == state_tau: color = tau_color
+        elif protein_type == state_map6: color = map6_color
 
         # get height_scale and check for map6 inversion
         height_scale = 1
-        if protein_type == 2 and invert_map6:
+        if protein_type == state_map6 and invert_map6:
             height_scale = -1
 
         # use a point with a horizontal error bar
@@ -193,11 +199,6 @@ def plot_clusters(
             linewidth=0,
             zorder=0,
         )
-
-    # get the states
-    state_tau = data_dict["df"].loc[sim_name]["state_tau"]
-    state_map6 = data_dict["df"].loc[sim_name]["state_map6"]
-    state_empty = data_dict["df"].loc[sim_name]["state_empty"]
 
     # plot each protein on the horizontal if protein points
     if protein_points_size != 0:
