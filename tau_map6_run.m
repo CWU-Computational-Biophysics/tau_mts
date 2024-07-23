@@ -15,7 +15,7 @@ for i = [1, 5, 10, 50]
 				% update values
 				tm_ratio = i;
 				t_force = j;
-				ttot = 100;
+				ttot = t;
 
 				% update save
 				data_dir = sprintf("data/paper_" + ttot + "_" + t_force);
