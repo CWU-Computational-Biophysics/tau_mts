@@ -3,15 +3,15 @@
 
 % define user-input simulation parameters
 % total simulation time [second]
-ttot = 1;
+ttot = 50;
 % T0/M0 ratio [#]
-tm_ratio = 1;
+tm_ratio = 10;
 % force leading edge tau binding [bool]
 t_force = true;
 % simulation save name
 datetime_str = string(datetime("now", Format="uuuuMMMdd-HHmmss"));
 sim_name = sprintf("taumap6_" + datetime_str);
-export_dir = fullfile("data");
+export_dir = fullfile("data/tests");
 
 % grid parameters
 % initial number of spatial grid points [#] (M=20)

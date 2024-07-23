@@ -2,9 +2,8 @@
 % Tau/Map6 project coarse grain model
 
 % load user-input parameters
-% clear;
-% tau_map6_params;
-% tau_map6_params_default;
+clear;
+tau_map6_params;
 
 % calculated parameters
 % base binding rate for tau [1/second] (T0)
@@ -160,14 +159,15 @@ for step_i = 1:(steps-1)
 
 	% enact growing or shrinking
 	if growth_state == state_growing
-		% increase the number of rows
-		% first define a new column of the not exist state
-		new_col = ones(steps, 1);
-		new_col = new_col .* state_empty;
-		
-		% append the column to the array
-		mt_grid = [mt_grid, new_col];
-		
+		% append a new column to the array if the new growth would create one
+        % current_mt_grid_length = size(mt_grid[step_i+1]);
+        if (grid_points + 1) > numel(mt_grid(step_i+1, :))
+		    % first define a new column of the not exist state
+            new_col = ones(steps, 1);
+            new_col = new_col .* state_notexist;
+		    mt_grid = [mt_grid, new_col];
+        end
+
 		% update the number of grid points
 		grid_points = grid_points + 1;
 
