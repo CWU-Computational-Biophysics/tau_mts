@@ -165,7 +165,7 @@ for step_i = 1:(steps-1)
 		    % first define a new column of the not exist state
             new_col = ones(steps, 1);
             new_col = new_col .* state_notexist;
-		    mt_grid = [mt_grid, new_col];
+		    mt_grid = [mt_grid, new_col]; %#ok<AGROW>
         end
 
 		% update the number of grid points
