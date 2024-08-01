@@ -20,4 +20,4 @@ echo "Script is running in the background with PID $PID."
 echo "Output is being logged to animate_all_output.log."
 
 # Write the PID to a text file
-echo $PID >> animate_all_pid.txt
+echo $PID > animate_all_pid.txt
