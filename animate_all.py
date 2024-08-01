@@ -1,8 +1,10 @@
-# animate.py
+# animate_all.py
 # animate all simulations from a directory
 
 # import packages
 import os
+import argparse
+import logging
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -14,21 +16,29 @@ from configurations import DEF_VAR_LIST, DEF_REM_COL_LIST, CSTYLE_FILE_STR
 from processing import load_mat_dir
 from distributions import create_protein_animation
 
+# configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# set up argument parser
+parser = argparse.ArgumentParser(description="Animate all simulations from a directory.")
+parser.add_argument('data_dir', type=str, help='The data directory containing simulation files.')
+args = parser.parse_args()
 
 # get the data directory from the user
-user_input = input("Enter the data directory: ")
-data_dir = Path(user_input)
-if not os.path.isdir(user_input):
+data_dir = Path(args.data_dir)
+if not os.path.isdir(data_dir):
     raise ValueError("Invalid data directory")
-print(f"Data directory set to '{data_dir}'.")
+logging.info(f"Data directory set to '{data_dir}'.")
 
 # configure the figure save directory
 FIGURE_DIR = Path("figures", data_dir.parts[-1])
 os.makedirs(FIGURE_DIR, exist_ok=True)
+logging.info(f"Figure directory set to '{FIGURE_DIR}'.")
 
 # configure the animation save directory
 ANIMATION_DIR = Path("animations", data_dir.parts[-1])
 os.makedirs(ANIMATION_DIR, exist_ok=True)
+logging.info(f"Animation directory set to '{ANIMATION_DIR}'.")
 
 # set plotting style
 plt.style.use(["default", CSTYLE_FILE_STR])
@@ -36,11 +46,9 @@ plt.style.use(["default", CSTYLE_FILE_STR])
 # set the colormap
 DEFAULT_COLORMAP = list(colormaps["tab10"].colors)
 
-
 # import the data dictionary
 # get the data dictionary from the data directory
 data_dict = load_mat_dir(data_dir, DEF_VAR_LIST, DEF_REM_COL_LIST)
-
 
 # add some calculations
 # add the final MT length to the sim_df
@@ -54,11 +62,10 @@ for sim_name, sim_dict in data_dict["sims"].items():
 data_dict["df"]["final_length_units"] = data_dict["df"].index.map(length_vals)
 
 # add final length column
-data_dict["df"]["final_length"] = data_dict["df"]["final_length_units"]*data_dict["df"]["dx"]
+data_dict["df"]["final_length"] = data_dict["df"]["final_length_units"] * data_dict["df"]["dx"]
 
 # create an averages df grouped by tm_ratio
 data_avg_df = data_dict["df"].groupby("tm_ratio").mean()
-
 
 # generate animations of all simulations
 # configure animation properties
@@ -85,7 +92,7 @@ for sim_name in sim_names:
     time_steps = data_dict["df"].loc[sim_name]["steps"]
     full_anim_time = int(time_steps / full_frame_rate)
 
-    # make the high rest animation
+    # make the high res animation
     create_protein_animation(
         save_path=ANIMATION_DIR / f"{sim_name}_full.mp4",
         sim_name=sim_name,
@@ -95,3 +102,5 @@ for sim_name in sim_names:
         overwrite=True,
         protein_points_size=0,
         binding_ticks=False)
+
+logging.info("Animation generation complete.")
