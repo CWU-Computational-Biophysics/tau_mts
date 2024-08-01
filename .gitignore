@@ -13,6 +13,7 @@ data/
 frames/
 animations/
 figures/
+old_data/
 
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:
