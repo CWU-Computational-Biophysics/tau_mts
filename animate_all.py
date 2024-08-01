@@ -1,7 +1,6 @@
 # animate.py
 # animate all simulations from a directory
 
-
 # import packages
 import os
 from pathlib import Path
