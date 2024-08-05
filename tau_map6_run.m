@@ -8,7 +8,7 @@ clear;
 for i = [0.1, 1, 5, 10, 50]
 	for j = [true, false]
 		for t = [50, 100]
-			for k = [1, 2, 3]
+			for k = [1]
 				% load params
 				tau_map6_params;
 
@@ -18,7 +18,7 @@ for i = [0.1, 1, 5, 10, 50]
 				ttot = t;
 
 				% update save
-				data_dir = sprintf("data" + "/paper_" + ttot + "_" + t_force);
+				data_dir = sprintf("data" + "/mapisdot1/paper_" + ttot + "_" + t_force);
 				export_dir = fullfile(data_dir);
 				sim_name = sprintf("taumap6_" + round(tm_ratio) + "_" + t_force + "_" + k);
 

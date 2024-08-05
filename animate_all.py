@@ -80,15 +80,15 @@ for subdir in parent_dir.iterdir():
         sim_names = list(data_dict["sims"].keys())
         for sim_name in sim_names:
             # make a low res animation
-            create_protein_animation(
-                save_path=ANIMATION_DIR / f"{sim_name}.mp4",
-                sim_name=sim_name,
-                data_dict=data_dict,
-                frame_rate=frame_rate,
-                anim_time=anim_time,
-                overwrite=True,
-                protein_points_size=0,
-                binding_ticks=False)
+            # create_protein_animation(
+            #     save_path=ANIMATION_DIR / f"{sim_name}.mp4",
+            #     sim_name=sim_name,
+            #     data_dict=data_dict,
+            #     frame_rate=frame_rate,
+            #     anim_time=anim_time,
+            #     overwrite=True,
+            #     protein_points_size=0,
+            #     binding_ticks=False)
 
             # make a full res animation that shows each time step
             # get the number of time steps
@@ -96,14 +96,14 @@ for subdir in parent_dir.iterdir():
             full_anim_time = int(time_steps / full_frame_rate)
 
             # make the high res animation
-            # create_protein_animation(
-            #     save_path=ANIMATION_DIR / f"{sim_name}_full.mp4",
-            #     sim_name=sim_name,
-            #     data_dict=data_dict,
-            #     frame_rate=full_frame_rate,
-            #     anim_time=full_anim_time,
-            #     overwrite=True,
-            #     protein_points_size=0,
-            #     binding_ticks=False)
+            create_protein_animation(
+                save_path=ANIMATION_DIR / f"{sim_name}_full.mp4",
+                sim_name=sim_name,
+                data_dict=data_dict,
+                frame_rate=full_frame_rate,
+                anim_time=full_anim_time,
+                overwrite=True,
+                protein_points_size=0,
+                binding_ticks=False)
 
 logging.info("Animation generation complete.")
