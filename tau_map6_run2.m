@@ -4,19 +4,20 @@
 % clear workspace
 clear;
 
-% define save location
-export_dir = fullfile(sprintf('data/dt_invariance'));
-
 % iterate over three legal values of 'dt'
-for dt_val = [0.01, 0.001, 0.0001]
+for dt_val = [0.01, 0.005, 0.001]
     % load params
     tau_map6_params;
+
+    % define save location
+    export_dir = fullfile(sprintf('data/tests3'));
 
     % update values
     tm_ratio = 1;
     t_force = true;
-    ttot = 50;
+    ttot = 10;
     dt = dt_val;
+    fprintf('dt=%g', dt)
 
     % run each simulation three times
     for i = 1:3
