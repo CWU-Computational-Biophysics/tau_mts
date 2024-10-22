@@ -25,4 +25,4 @@ save_dir = fullfile('data', 'tests');
 [~, ~, ~] = mkdir(save_dir);
 save_file = fullfile(save_dir, save_name);
 save(save_file, '-nocompression', '-v7');
-fprintf("Simulation saved to '%s'\n", save_file)
+fprintf("Simulation saved to '%s.mat'\n", save_file)
