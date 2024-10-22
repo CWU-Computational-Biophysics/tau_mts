@@ -424,3 +424,7 @@ class Simulation:
             [r"Tau Sequence", r"Map6 Sequence"],
             loc='upper left',
         )
+
+
+    def plot_proteins_at(self):
+        pass
