@@ -13,12 +13,19 @@ import numpy.typing as npt
 import pandas as pd
 import scipy.io as sio
 
+import matplotlib.pyplot as plt
+
+from matplotlib.axes import Axes
+from matplotlib import colormaps
+from matplotlib.ticker import MaxNLocator
+from matplotlib.animation import FuncAnimation
+
 from sequence import Sequence
 
 
 class Simulation:
 
-    def __init__(self, mat_file: PathLike):
+    def __init__(self, mat_file: PathLike, color_dict: dict = None):
         # convert to Path and check that file exists
         mat_file = Path(mat_file)
         if not mat_file.exists():
@@ -48,6 +55,16 @@ class Simulation:
 
         # make and verify trimmed grids
         self.trim_grid = self._gen_trimmed_grids()
+
+        # check if the color dict has the same keys as grid_dict
+        # if there are missing keys, add them with value None
+        if color_dict is not None:
+            for key in self.grid_dict:
+                if key not in color_dict:
+                    color_dict[key] = None
+
+        # store the color dict
+        self.color_dict = color_dict
 
 
     def _gen_trimmed_grids(self) -> list[npt.ArrayLike]:
@@ -292,3 +309,118 @@ class Simulation:
         df['length'] = df['length_units'] * self.get_param('dx')
 
         return df
+
+
+    def calc_plot_y_lims_at(self, step: int, override: float = None) -> float:
+        # ensure step is valid
+        if not self._valid_step(step):
+            raise ValueError(f"Invalid step: {step}")
+
+        # get the largest value on the y-axis
+        # this is the largest length of a sequence at this step
+        longest_seq = max([seq.get_length() for seq in self._seq_iter(step)])
+
+        # calculate absolute ymax
+        abs_ymax = longest_seq
+        if override:
+            abs_ymax = override
+
+        # force largest value to be the next highest multiple of 5
+        ymax = np.ceil(abs_ymax / 5) * 5
+
+        return ymax
+
+
+    def plot_sequence_at(self, ax: Axes, step: int, one_side: bool = False, max_len: bool = True) -> None:
+        # ensure step is valid
+        if not self._valid_step(step):
+            raise ValueError(f"Invalid step: {step}")
+
+        # set the plot x-limits by length
+        # either by true max or current max
+        if max_len:
+            ax.set_xlim(0, self.get_max_length())
+        else:
+            ax.set_xlim(0, self.get_length_at(step))
+
+        # set the y-limits by calculation
+        ymax = self.calc_plot_y_lims_at(step)
+        if not one_side:
+            # symmetric limits
+            ax.set_ylim(ymin=-ymax, ymax=ymax)
+
+            # relabel the y-axis in absolute value using a formatter
+            ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+            ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{abs(x):.0f}"))
+        else:
+            # bars are all vertical
+            ax.set_ylim(ymin=0, ymax=ymax)
+
+        # iterate over the sequences at the current step
+        for seq in self.get_sequence_plot_points_at(step).itertuples(index=False):
+            # skip empty sequences
+            if seq.type == self.get_grid_type('empty'):
+                continue
+
+            # error on notexist sequences
+            if seq.type == self.get_grid_type('notexist'):
+                raise ValueError("Cannot plot NOTEXIST sequences")
+
+            # check that the protein type is in the color dict
+            if seq.type not in self.color_dict:
+                raise ValueError(f"Color not defined for protein: {seq.type}")
+            color = self.color_dict[seq.type]
+
+            # define a height inverter for map6 when not using one_side
+            height_inverter = 1
+            if (not one_side) and (seq.type == self.get_grid_type('map6')):
+                height_inverter = -1
+
+            # collect the points to plot
+            start_x = seq.start_pos
+            end_x = seq.end_pos
+            end_y = seq.length_units * height_inverter
+
+            # plot a horizontal error bar for the top of the sequence bar
+            ax.errorbar(
+                x=(start_x + end_x) / 2,
+                y=end_y,
+                xerr=(end_x - start_x) / 2,
+                fmt='none',
+                ecolor=color,
+                capsize=5,
+                capthick=2,
+            )
+
+            # shade the region below the bar with no outline
+            ax.fill_between(
+                x=[start_x, end_x],
+                y1=0,
+                y2=end_y,
+                color=color,
+                alpha=1,
+                linewidth=0,
+                zorder=0,
+            )
+
+        # draw a horizontal black line at y=0
+        ax.axhline(0, color='black', linewidth=1)
+
+        # set the labels
+        ax.set_xlabel(r"Position along microtubule $\left[\qty{}{\micro\meter}\right]$")
+        ax.set_ylabel(r"Number of proteins in uninterupted sequence")
+        ax.set_title(r"Protein cluster distribution along microtubule")
+
+        # add a legend with a label for map6 and tau using artists
+        # the label should be a colored rectangle
+        tau_color = self.color_dict[self.get_grid_type('tau')]
+        map6_color = self.color_dict[self.get_grid_type('map6')]
+        tau_label = plt.Rectangle((0, 0), 1, 1, fc=tau_color, edgecolor="black")
+        map6_label = plt.Rectangle((0, 0), 1, 1, fc=map6_color, edgecolor="black")
+
+        # add legend to the upper-left
+        ax.legend(
+            [tau_label, map6_label],
+            [r"Tau Sequence", r"Map6 Sequence"],
+            loc='upper left',
+        )
