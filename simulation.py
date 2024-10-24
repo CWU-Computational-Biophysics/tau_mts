@@ -25,7 +25,7 @@ from sequence import Sequence
 
 class Simulation:
 
-    def __init__(self, mat_file: PathLike, color_dict: dict = None):
+    def __init__(self, mat_file: PathLike, color_dict: dict = None, marker_dict: dict = None):
         # convert to Path and check that file exists
         mat_file = Path(mat_file)
         if not mat_file.exists():
@@ -58,13 +58,27 @@ class Simulation:
 
         # check if the color dict has the same keys as grid_dict
         # if there are missing keys, add them with value None
+        self.color_dict = None
         if color_dict is not None:
-            for key in self.grid_dict:
-                if key not in color_dict:
-                    color_dict[key] = None
+            self.set_color_dict(color_dict)
+        else:
+            # create a default color dict
+            color_dict = {k:None for k in self.grid_dict}
+            color_dict[self.get_grid_type('tau')] = 'tab:blue'
+            color_dict[self.get_grid_type('map6')] = 'tab:orange'
+            self.color_dict = color_dict
 
-        # store the color dict
-        self.color_dict = color_dict
+        # check if the marker dict has the same keys as grid_dict
+        # if there are missing keys, add them with value None
+        self.marker_dict = None
+        if marker_dict is not None:
+            self.set_marker_dict(marker_dict)
+        else:
+            # create a default marker dict
+            marker_dict = {k:None for k in self.grid_dict}
+            marker_dict[self.get_grid_type('tau')] = 'o'
+            marker_dict[self.get_grid_type('map6')] = 's'
+            self.marker_dict = marker_dict
 
 
     def _gen_trimmed_grids(self) -> list[npt.ArrayLike]:
@@ -121,7 +135,7 @@ class Simulation:
         # initialize the sequence finder with the first index and protein
         start_index = 0
         start_protein = grid[0]
-        print(f"Start protein: {start_protein}, index: {start_index}")
+        # print(f"Start protein: {start_protein}, index: {start_index}")
 
         # iterate over the proteins in grid
         for i, protein in enumerate(grid):
@@ -153,6 +167,38 @@ class Simulation:
 
         # return the sequence list
         return sequence_list
+
+
+    def set_color_dict(self, color_dict: dict) -> None:
+        # check that color_dict has the same keys as grid_dict
+        # if there are missing keys, add them with value None
+        for key in self.grid_dict:
+            if key not in color_dict:
+                color_dict[key] = None
+
+        # report a warning for extra keys in color dict
+        for key in color_dict:
+            if key not in self.grid_dict:
+                print(f"Warning: Extra key in color dict: {key}")
+
+        # store the color dict
+        self.color_dict = color_dict
+
+
+    def set_marker_dict(self, marker_dict: dict) -> None:
+        # check that marker_dict has the same keys as grid_dict
+        # if there are missing keys, add them with value None
+        for key in self.grid_dict:
+            if key not in marker_dict:
+                marker_dict[key] = None
+
+        # report a warning for extra keys in marker dict
+        for key in marker_dict:
+            if key not in self.grid_dict:
+                print(f"Warning: Extra key in marker dict: {key}")
+
+        # store the marker dict
+        self.marker_dict = marker_dict
 
 
     def get_nsteps(self) -> int:
@@ -221,6 +267,21 @@ class Simulation:
         return len(self.get_trimmed_grid_at(step))
 
 
+    def get_length_diff_at(self, step: int) -> float:
+        # ensure step is valid
+        if not self._valid_step(step):
+            raise ValueError(f"Invalid step: {step}")
+
+        # get the true length at the step
+        true_len = self.get_length_at(step)
+
+        # get the length in domains
+        domain_len = self.get_length_units_at(step) * self.get_param('dx')
+
+        # report the difference
+        return true_len - domain_len
+
+
     def get_max_length_units(self) -> int:
         return len(self.get_grid_at(0))
 
@@ -275,6 +336,7 @@ class Simulation:
         # add a column 'pos' equal to 'index' * 'dx'
         dx = self.get_param('dx')
         df['domain_start_pos'] = df['index'] * dx
+        df['domain_end_pos'] = (df['index'] + 1) * dx
         df['protein_draw_pos'] = df['domain_start_pos'] + (dx/2)
 
         # check that 'index' col is equal to the index of the df
@@ -331,7 +393,7 @@ class Simulation:
         return ymax
 
 
-    def plot_sequence_at(self, ax: Axes, step: int, one_side: bool = False, max_len: bool = True) -> None:
+    def add_plot_elements(self, ax: Axes, step: int, max_len: bool = True) -> None:
         # ensure step is valid
         if not self._valid_step(step):
             raise ValueError(f"Invalid step: {step}")
@@ -342,6 +404,19 @@ class Simulation:
             ax.set_xlim(0, self.get_max_length())
         else:
             ax.set_xlim(0, self.get_length_at(step))
+
+        # set the labels
+        ax.set_xlabel(r"Position along microtubule $\left[\qty{}{\micro\meter}\right]$")
+        ax.set_title(r"Protein cluster distribution along microtubule")
+
+
+    def plot_sequence_at(self, ax: Axes, step: int, one_side: bool = False, max_len: bool = True, plot_points: bool = False, point_domain_ticks: bool = False) -> None:
+        # ensure step is valid
+        if not self._valid_step(step):
+            raise ValueError(f"Invalid step: {step}")
+
+        # add default plot elements
+        self.add_plot_elements(ax, step, max_len)
 
         # set the y-limits by calculation
         ymax = self.calc_plot_y_lims_at(step)
@@ -386,10 +461,9 @@ class Simulation:
                 x=(start_x + end_x) / 2,
                 y=end_y,
                 xerr=(end_x - start_x) / 2,
-                fmt='none',
-                ecolor=color,
-                capsize=5,
-                capthick=2,
+                fmt='o',
+                markersize=0,
+                color=color,
             )
 
             # shade the region below the bar with no outline
@@ -404,12 +478,10 @@ class Simulation:
             )
 
         # draw a horizontal black line at y=0
-        ax.axhline(0, color='black', linewidth=1)
+        ax.axhline(0, color='black')
 
-        # set the labels
-        ax.set_xlabel(r"Position along microtubule $\left[\qty{}{\micro\meter}\right]$")
+        # add y-axis label
         ax.set_ylabel(r"Number of proteins in uninterupted sequence")
-        ax.set_title(r"Protein cluster distribution along microtubule")
 
         # add a legend with a label for map6 and tau using artists
         # the label should be a colored rectangle
@@ -421,10 +493,106 @@ class Simulation:
         # add legend to the upper-left
         ax.legend(
             [tau_label, map6_label],
-            [r"Tau Sequence", r"Map6 Sequence"],
+            [r"Tau", r"MAP6"],
             loc='upper left',
         )
 
+        # possibly call plot_proteins_at
+        if plot_points:
+            self.plot_proteins_at(
+                ax,
+                step,
+                remove_yaxis=False,
+                domain_ticks=point_domain_ticks,
+                max_len=max_len)
 
-    def plot_proteins_at(self):
-        pass
+
+    def plot_proteins_at(self, ax: Axes, step: int, remove_yaxis: bool = False, domain_ticks: bool = False, max_len: bool = True):
+        # ensure step is valid
+        if not self._valid_step(step):
+            raise ValueError(f"Invalid step: {step}")
+
+        # add default plot elements
+        self.add_plot_elements(ax, step, max_len)
+
+        # check for remove_yaxis
+        if remove_yaxis:
+            ax.yaxis.set_visible(False)
+
+        # define the binding tick height as 2% of the y_lim
+        ymax = self.calc_plot_y_lims_at(step)
+        binding_tick_height = 0.02 * ymax
+
+        # iterate over proteins
+        for protein in self.get_protein_plot_points_at(step).itertuples(index=False):
+            # if domain_ticks, add vertical lines at domain_end_pos
+            if domain_ticks:
+                ax.vlines(
+                    x=protein.domain_end_pos,
+                    ymin=-binding_tick_height,
+                    ymax=binding_tick_height,
+                    color='black',
+                )
+
+            # skip 'empty' type proteins
+            if protein.type == self.get_grid_type('empty'):
+                continue
+
+            # error on 'notexist' type proteins
+            if protein.type == self.get_grid_type('notexist'):
+                raise ValueError(f"Error at step {step}: cannot plot NOTEXIST proteins")
+
+            # check that the protein type is in the color dict
+            if protein.type not in self.color_dict:
+                raise ValueError(f"Error at step {step}: color not defined for protein: {protein.type}")
+
+            # get the color for this protein
+            color = self.color_dict[protein.type]
+
+            # get the marker for this protein
+            marker = self.marker_dict[protein.type]
+
+            # plot the protein as a circle with a black edge
+            ax.scatter(
+                x=protein.protein_draw_pos,
+                y=0,
+                s=100,
+                c=color,
+                edgecolor='black',
+                zorder=2,
+                marker=marker,
+            )
+
+        # add a legend with a label for map6 and tau using artists
+        # the label should be a colored rectangle
+        # the label should respect the marker choice
+        tau_color = self.color_dict[self.get_grid_type('tau')]
+        map6_color = self.color_dict[self.get_grid_type('map6')]
+        tau_marker = self.marker_dict[self.get_grid_type('tau')]
+        map6_marker = self.marker_dict[self.get_grid_type('map6')]
+        tau_label = plt.Line2D(
+            [0], [0],
+            marker=tau_marker,
+            color='w',
+            markerfacecolor=tau_color,
+            markersize=10,
+            markeredgecolor='black',
+        )
+        map6_label = plt.Line2D(
+            [0], [0],
+            marker=map6_marker,
+            color='w',
+            markerfacecolor=map6_color,
+            markersize=10,
+            markeredgecolor='black'
+        )
+        # tau_label = plt.Rectangle((0, 0), 1, 1, fc=tau_color, edgecolor="black")
+        # map6_label = plt.Rectangle((0, 0), 1, 1, fc=map6_color, edgecolor="black")
+
+        # add legend to the upper-left
+        # append, do not erase
+        ax.legend(
+            [tau_label, map6_label],
+            [r"Tau", r"MAP6"],
+            loc='upper left',
+        )
