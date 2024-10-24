@@ -20,12 +20,14 @@ from matplotlib import colormaps
 from matplotlib.ticker import MaxNLocator
 from matplotlib.animation import FuncAnimation
 
+from rich import print
+
 from sequence import Sequence
 
 
 class Simulation:
 
-    def __init__(self, mat_file: PathLike, color_dict: dict = None, marker_dict: dict = None):
+    def __init__(self, mat_file: PathLike, color_dict: dict = None, marker_dict: dict = None, skip_check: bool = False):
         # convert to Path and check that file exists
         mat_file = Path(mat_file)
         if not mat_file.exists():
@@ -79,6 +81,14 @@ class Simulation:
             marker_dict[self.get_grid_type('tau')] = 'o'
             marker_dict[self.get_grid_type('map6')] = 's'
             self.marker_dict = marker_dict
+
+
+        # run sim self check
+        if not skip_check:
+            print(f"[green]Running sim self check.[/green]")
+            result = self._sim_self_check()
+            if not result:
+                print("[red]Warning: Simulation failed self-check[/red]")
 
 
     def _gen_trimmed_grids(self) -> list[npt.ArrayLike]:
@@ -169,6 +179,69 @@ class Simulation:
         return sequence_list
 
 
+    def _sim_self_check(self) -> bool:
+        # validate that mt grid count only increases when mt state is growing
+        # likewise, mt grid count only decrases when mt state is shrinking
+        # likewise, mt grid count does not change when mt state is stable
+
+        # iterate over all steps
+        has_passed = True
+        for si in np.arange(self.get_nsteps() - 1):
+            # retrieve the current length, grid count, and state
+            length = self.get_length_at(si)
+            grids = self.get_length_units_at(si)
+            state = self.get_growth_state_at(si)
+
+            # retrieve the next length and state
+            next_length = self.get_length_at(si + 1)
+            next_grids = self.get_length_units_at(si + 1)
+            # next_state = self.get_growth_state_at(si + 1)
+
+            # calculate delta length and growth rate
+            delta_length = next_length - length
+            delta_grid = next_grids - grids
+            growth_rate = delta_length / self.get_param('dt')
+
+            # error if the length decreases when the state is growing
+            if state == self.get_growth_type('growing') and delta_length < 0:
+                has_passed = False
+                print(f"[yellow]Warning: Length decreased ({delta_length}) under growth at step {si}[/yellow]")
+
+            # error if the length increases when the state is shrinking
+            if state == self.get_growth_type('shrinking') and delta_length > 0:
+                has_passed = False
+                print(f"[yellow]Warning: Length increased ({delta_length}) under shrinkage at step {si}[/yellow]")
+
+            # error if the length changes when the state is stable
+            if state == self.get_growth_type('stable') and delta_length != 0:
+                has_passed = False
+                print(f"[yellow]Warning: Length changed ({delta_length}) under stability at step {si}[/yellow]")
+
+            # error if the growth rate is greater than vp with slight margin for floating point error
+            if abs(growth_rate) > self.get_param('vp') + 1e-6:
+                has_passed = False
+                print(f"[yellow]Warning: Length changed ({delta_length}) faster ({growth_rate}) than vp at step {si}[/yellow]")
+
+            # error if the grid count changes by more than 1
+            if abs(delta_grid) > 1:
+                has_passed = False
+                print(f"[yellow]Warning: Grid count changed by more than 1 ({delta_grid}) at step {si}[/yellow]")
+
+
+            # check for inconsistent NOTEXIST sequence
+            # find occurences of NOTEXIST
+            notexists = np.where(self.get_grid_at(si) == self.get_grid_type('notexist'))[0]
+
+            # ensure that after the first notexist index
+            # each subsequent index is one greater than the last
+            if not np.all(np.diff(notexists) == 1):
+                has_passed = False
+                print(f"[yellow]Warning: Inconsistent NOTEXIST chain at step {si}[/yellow]")
+
+        # return the result
+        return has_passed
+
+
     def set_color_dict(self, color_dict: dict) -> None:
         # check that color_dict has the same keys as grid_dict
         # if there are missing keys, add them with value None
@@ -211,6 +284,14 @@ class Simulation:
             raise ValueError(f"Invalid parameter: {param}")
 
         return self.param_dict[param]
+
+
+    def get_growth_state_at(self, step: int) -> int:
+        # ensure step is valid
+        if not self._valid_step(step):
+            raise ValueError(f"Invalid step: {step}")
+
+        return self.state_vec[step]
 
 
     def get_grid_type(self, grid: str) -> int:
