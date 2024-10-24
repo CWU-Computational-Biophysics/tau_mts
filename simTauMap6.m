@@ -62,7 +62,7 @@ for si = 1:(nsteps-1)
     % this method locates the first index of a NOTEXIST grid point
     curr_grid_vector = mt_grid(si, :);
     [~, curr_gps] = find(curr_grid_vector==grids.NOTEXIST, 1);
-    
+
     % check if curr_gps is empty (MT fully exists / no NOTEXIST spaces)
     % else, the number of grid spaces in existence is one less
     if numel(curr_gps) == 0
@@ -70,17 +70,17 @@ for si = 1:(nsteps-1)
     else
         curr_gps = curr_gps - 1;
     end
-    
+
     % pass the current grid vector to the next step as empty
     mt_grid(si+1, 1:curr_gps) = grids.EMPTY;
-    
+
     %% Individual grid point checks
     % loop ovver grid points
     for gi = 1:curr_gps
         % calculate neighbor occupancy
         tau_next = 0;
         map6_next = 0;
-    
+
         % check left protein
         if gi ~= 1
             left_protein = mt_grid(si, gi-1);
@@ -90,7 +90,7 @@ for si = 1:(nsteps-1)
                 map6_next = map6_next + 1;
             end
         end
-    
+
         % check right protein
         if gi ~= curr_gps
             right_protein = mt_grid(si, gi+1);
@@ -100,16 +100,16 @@ for si = 1:(nsteps-1)
                 map6_next = map6_next + 1;
             end
         end
-    
+
         % calculate protein effective on/off rates
         tau_off_eff = (params.tau_off - (params.alpha_t * params.tau_off * tau_next)) * params.dt;
         map6_off_eff = (params.map6_off - (params.alpha_m * params.map6_off * map6_next)) * params.dt;
         tau_on_eff = params.tau_on * params.dt;
         map6_on_eff = params.map6_on * params.dt;
-    
+
         % get the current protein for occupancy update
         curr_protein = mt_grid(si, gi);
-    
+
         % empty site options (new protein binding)
         if curr_protein == grids.EMPTY
             if rand() < tau_on_eff
@@ -123,7 +123,7 @@ for si = 1:(nsteps-1)
                 mt_grid(si+1, gi) = grids.EMPTY;
             end
         end
-    
+
         % tau site options (unbinding or not)
         if curr_protein == grids.TAU
             if rand() < tau_off_eff
@@ -134,7 +134,7 @@ for si = 1:(nsteps-1)
                 mt_grid(si+1, gi) = grids.TAU;
             end
         end
-    
+
         % map6 site options (unbinding or not)
         if curr_protein == grids.MAP6
             if rand() < map6_off_eff
@@ -146,8 +146,8 @@ for si = 1:(nsteps-1)
             end
         end
     end
-    
-    
+
+
     %% Check for MT dynamics
     % define the boolean grid for tau proteins
     % this grid uses the last three existing sites
@@ -155,7 +155,7 @@ for si = 1:(nsteps-1)
     first = max([curr_gps - 2, 1]);
     tau_grid = mt_grid(si, (first:last))==grids.TAU;
     tau_sum = sum(tau_grid);
-    
+
     % MT may become dynamic when tau bound in the last three sites
     curr_state = mt_state(si);
     next_state = mt_state(si);
@@ -176,23 +176,23 @@ for si = 1:(nsteps-1)
             end
         end
     end
-    
+
     % update next state
     mt_state(si+1) = next_state;
-    
+
     %% Check for MT growth/shrinking
     % update MT length
-    if next_state == growths.GROWING
+    if curr_state == growths.GROWING
         % increase the MT length
         mt_length(si+1) = mt_length(si) + (params.vp * params.dt);
-    elseif next_state == growths.SHRINKING
+    elseif curr_state == growths.SHRINKING
         % decrease the MT length
-        mt_length(si+1) = mt_length(si) + (params.vm * paramd.dt);
+        mt_length(si+1) = mt_length(si) - (params.vm * paramd.dt);
     else
         % persist MT length
         mt_length(si+1) = mt_length(si);
     end
-    
+
     %% Update grid points based on growth
     % calculate the next number of grid points from the MT length
     true_gps = floor(mt_length(si+1) / params.dx);
@@ -210,22 +210,23 @@ for si = 1:(nsteps-1)
         next_gps = next_gps - 1;
     end
 
-    
+
     % find the difference in grid points
     diff_gps = true_gps - next_gps;
-    
+
     % update the mt_grid based on diff_gps
     if diff_gps > 0
+        % TODO: CHECK THIS FOR EXCESS COLUMN APPENDING
         % adding new grid spaces to mt_grid
         % define a new NOTEXIST column to append to the array
         new_col = ones(nsteps, diff_gps) .* grids.NOTEXIST;
-    
+
         % append the NOTEXIST column
         mt_grid = [mt_grid, new_col]; %#ok<AGROW>
-    
+
         % empty the new grid points at the next step
         mt_grid(si+1, next_gps:true_gps) = grids.EMPTY;
-    
+
         % check for tau gating
         if params.tau_gating
             mt_grid(si+1, next_gps:true_gps) = grids.TAU;
@@ -235,11 +236,11 @@ for si = 1:(nsteps-1)
         % set the diff_gps values to NOTEXIST
         mt_grid(si+1, true_gps:next_gps) = grids.NOTEXIST;
     end
-    
+
     %% Update the grid to reflect potentially nonexistent sites
     % get the column count
     col_count = length(mt_grid(si+1, :));
-    
+
     % check if any grid points need to be marked NOTEXIST
     if col_count > true_gps
         % mark the points between true and col as NOTEXIST
