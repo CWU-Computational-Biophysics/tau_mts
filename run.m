@@ -5,7 +5,7 @@
 clear;
 
 % define save file name
-save_name = 'simulation';
+save_name = 'simulation3';
 
 % initialize simulation parameters
 params = genParams(ttot=10, tau_gating=true);

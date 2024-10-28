@@ -6,7 +6,7 @@
 # imports
 from os import PathLike
 from pathlib import Path
-from typing import Iterator
+from typing import Callable, Iterator
 
 import numpy as np
 import numpy.typing as npt
@@ -16,11 +16,12 @@ import scipy.io as sio
 import matplotlib.pyplot as plt
 
 from matplotlib.axes import Axes
-from matplotlib import colormaps
+from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 from matplotlib.animation import FuncAnimation
 
 from rich import print
+from tqdm import tqdm
 
 from sequence import Sequence
 
@@ -32,6 +33,10 @@ class Simulation:
         mat_file = Path(mat_file)
         if not mat_file.exists():
             raise FileNotFoundError(f"File not found: {mat_file}")
+
+        # set the simulation name based on the file path
+        self.sim_name = mat_file.stem
+        self.sim_file = mat_file
 
         # load the data file with scipy
         data = sio.loadmat(
@@ -52,8 +57,9 @@ class Simulation:
         # save the MT grid
         self.raw_grid = np.array(data['mt_grid'])
 
-        # calculate and save the number of simulation steps
+        # calculate and save the number of simulation steps and time vector
         self.nsteps = len(self.length_vec)
+        self.time_vec = np.arange(self.get_nsteps()) * self.get_param('dt')
 
         # make and verify trimmed grids
         self.trim_grid = self._gen_trimmed_grids()
@@ -85,10 +91,10 @@ class Simulation:
 
         # run sim self check
         if not skip_check:
-            print(f"[green]Running sim self check.[/green]")
+            print(f"[green]Running self check on '{self.sim_name}'[/green]")
             result = self._sim_self_check()
             if not result:
-                print("[red]Warning: Simulation failed self-check[/red]")
+                print(f"[red]Warning: Simulation '{self.sim_name}' failed self-check[/red]")
 
 
     def _gen_trimmed_grids(self) -> list[npt.ArrayLike]:
@@ -225,7 +231,7 @@ class Simulation:
             # error if the grid count changes by more than 1
             if abs(delta_grid) > 1:
                 has_passed = False
-                print(f"[yellow]Warning: Grid count changed by more than 1 ({delta_grid}) at step {si}[/yellow]")
+                print(f"[yellow]Warning: Grid count changed by {delta_grid} at step {si}[/yellow]")
 
 
             # check for inconsistent NOTEXIST sequence
@@ -348,6 +354,14 @@ class Simulation:
         return len(self.get_trimmed_grid_at(step))
 
 
+    def get_length_vec(self) -> npt.ArrayLike:
+        return self.length_vec
+
+
+    def get_time_vec(self) -> npt.ArrayLike:
+        return self.time_vec
+
+
     def get_length_diff_at(self, step: int) -> float:
         # ensure step is valid
         if not self._valid_step(step):
@@ -454,6 +468,23 @@ class Simulation:
         return df
 
 
+    def get_longest_seq(self, step: int = None) -> float:
+        # if step is provided, then ensure it is valid
+        if step is not None and not self._valid_step(step):
+            raise ValueError(f"Invalid step: {step}")
+
+        # if step is provided, return the longest sequence at that step
+        if step is not None:
+            return max([seq.get_length() for seq in self._seq_iter(step)])
+
+        # otherwise get the longest over all steps
+        seq_list = [
+            max([seq.get_length() for seq in self._seq_iter(si)])
+            for si in np.arange(self.get_nsteps())
+        ]
+        return max(seq_list)
+
+
     def calc_plot_y_lims_at(self, step: int, override: float = None) -> float:
         # ensure step is valid
         if not self._valid_step(step):
@@ -461,7 +492,7 @@ class Simulation:
 
         # get the largest value on the y-axis
         # this is the largest length of a sequence at this step
-        longest_seq = max([seq.get_length() for seq in self._seq_iter(step)])
+        longest_seq = self.get_longest_seq(step=step)
 
         # calculate absolute ymax
         abs_ymax = longest_seq
@@ -474,7 +505,7 @@ class Simulation:
         return ymax
 
 
-    def add_plot_elements(self, ax: Axes, step: int, max_len: bool = True) -> None:
+    def add_plot_elements(self, step: int, ax: Axes, max_len: bool = True) -> None:
         # ensure step is valid
         if not self._valid_step(step):
             raise ValueError(f"Invalid step: {step}")
@@ -491,16 +522,16 @@ class Simulation:
         ax.set_title(r"Protein cluster distribution along microtubule")
 
 
-    def plot_sequence_at(self, ax: Axes, step: int, one_side: bool = False, max_len: bool = True, plot_points: bool = False, point_domain_ticks: bool = False) -> None:
+    def plot_sequence_at(self, step: int, ax: Axes, one_side: bool = False, max_len: bool = True, plot_points: bool = False, point_domain_ticks: bool = False, ymax_override: float = None) -> None:
         # ensure step is valid
         if not self._valid_step(step):
             raise ValueError(f"Invalid step: {step}")
 
         # add default plot elements
-        self.add_plot_elements(ax, step, max_len)
+        self.add_plot_elements(step, ax, max_len)
 
         # set the y-limits by calculation
-        ymax = self.calc_plot_y_lims_at(step)
+        ymax = self.calc_plot_y_lims_at(step, override=ymax_override)
         if not one_side:
             # symmetric limits
             ax.set_ylim(ymin=-ymax, ymax=ymax)
@@ -558,8 +589,13 @@ class Simulation:
                 zorder=0,
             )
 
-        # draw a horizontal black line at y=0
-        ax.axhline(0, color='black')
+        # draw a horizontal black line at y=0 from x=0 to the current length of the MT
+        mt_len = self.get_length_at(step)
+        ax.plot(
+            [0, mt_len],
+            [0, 0],
+            color='black',
+        )
 
         # add y-axis label
         ax.set_ylabel(r"Number of proteins in uninterupted sequence")
@@ -581,20 +617,20 @@ class Simulation:
         # possibly call plot_proteins_at
         if plot_points:
             self.plot_proteins_at(
-                ax,
-                step,
+                step=step,
+                ax=ax,
                 remove_yaxis=False,
                 domain_ticks=point_domain_ticks,
                 max_len=max_len)
 
 
-    def plot_proteins_at(self, ax: Axes, step: int, remove_yaxis: bool = False, domain_ticks: bool = False, max_len: bool = True):
+    def plot_proteins_at(self, step: int, ax: Axes, remove_yaxis: bool = False, domain_ticks: bool = False, max_len: bool = True) -> None:
         # ensure step is valid
         if not self._valid_step(step):
             raise ValueError(f"Invalid step: {step}")
 
         # add default plot elements
-        self.add_plot_elements(ax, step, max_len)
+        self.add_plot_elements(step, ax, max_len)
 
         # check for remove_yaxis
         if remove_yaxis:
@@ -677,3 +713,27 @@ class Simulation:
             [r"Tau", r"MAP6"],
             loc='upper left',
         )
+
+
+    def animate_sequences(self, fig: Figure, anim_func: Callable, save_file: PathLike, progress_bar: bool = True) -> None:
+        # ensure the save_file path exists
+        save_file = Path(save_file)
+        save_file.parent.mkdir(parents=True, exist_ok=True)
+
+        # run the animation generator
+        with tqdm(
+            total=self.get_nsteps(),
+            desc=f"Generating Animation: '{save_file.name}'",
+            disable=(not progress_bar)
+            ) as pbar:
+
+            # pbar update function
+            def update(*args):
+                pbar.update(1)
+
+            # generate the animation
+            frames = self.get_nsteps()
+            animation = FuncAnimation(fig, anim_func, frames=frames, repeat=False)
+
+            # iterate over the animation function and save
+            animation.save(save_file, writer='ffmpeg', progress_callback=update, dpi=100, fps=30)

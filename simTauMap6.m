@@ -20,7 +20,7 @@ eff_rate_vector = rate_vector .* params.dt;
 if any(eff_rate_vector >= 1)
     error('dt=%g is too high, some rate parameter is >= 1', params.dt)
 elseif any(eff_rate_vector >= 0.1)
-    warning('dt=%g is high, some rate paramater is >= 0.1', params.dt)
+    warning('dt=%g is high, some rate parameter is >= 0.1', params.dt)
 end
 
 % validate that effective growth rate is below 1 domain/step
