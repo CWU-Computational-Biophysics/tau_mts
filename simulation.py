@@ -737,3 +737,7 @@ class Simulation:
 
             # iterate over the animation function and save
             animation.save(save_file, writer='ffmpeg', progress_callback=update, dpi=100, fps=30)
+
+
+    def get_name(self) -> str:
+        return self.sim_name
