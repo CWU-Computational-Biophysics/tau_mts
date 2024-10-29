@@ -71,7 +71,7 @@ class Simulation:
             self.set_color_dict(color_dict)
         else:
             # create a default color dict
-            color_dict = {k:None for k in self.grid_dict}
+            color_dict = {self.get_grid_type(k):None for k in self.grid_dict}
             color_dict[self.get_grid_type('tau')] = 'tab:blue'
             color_dict[self.get_grid_type('map6')] = 'tab:orange'
             self.color_dict = color_dict
@@ -83,7 +83,7 @@ class Simulation:
             self.set_marker_dict(marker_dict)
         else:
             # create a default marker dict
-            marker_dict = {k:None for k in self.grid_dict}
+            marker_dict = {self.get_grid_type(k):None for k in self.grid_dict}
             marker_dict[self.get_grid_type('tau')] = 'o'
             marker_dict[self.get_grid_type('map6')] = 's'
             self.marker_dict = marker_dict
@@ -251,13 +251,13 @@ class Simulation:
     def set_color_dict(self, color_dict: dict) -> None:
         # check that color_dict has the same keys as grid_dict
         # if there are missing keys, add them with value None
-        for key in self.grid_dict:
+        for key in list(self.grid_dict.values()):
             if key not in color_dict:
                 color_dict[key] = None
 
         # report a warning for extra keys in color dict
         for key in color_dict:
-            if key not in self.grid_dict:
+            if key not in list(self.grid_dict.values()):
                 print(f"Warning: Extra key in color dict: {key}")
 
         # store the color dict
@@ -741,3 +741,11 @@ class Simulation:
 
     def get_name(self) -> str:
         return self.sim_name
+
+
+    def get_color_dict(self) -> dict:
+        return self.color_dict
+
+
+    def get_raw_grid(self) -> npt.ArrayLike:
+        return self.raw_grid
