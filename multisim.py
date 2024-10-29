@@ -107,3 +107,13 @@ class MultiSim:
 
     def get_iter(self) -> Iterable[Simulation]:
         return iter(self.sim_list)
+
+
+    def sort_by(self, param: str) -> None:
+        # check that param is a valid parameter in each simulation
+        if not all(param in sim.param_dict for sim in self.get_iter()):
+            print("[red]Error:[/red] param is not a valid parameter")
+            return
+
+        # sort the sim_list by the parameter
+        self.sim_list.sort(key=lambda x: x.get_param(param))

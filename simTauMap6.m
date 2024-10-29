@@ -30,16 +30,13 @@ if eff_growth_rate > 1
 end
 
 %% Initialize the simulation
-% get the simulation parameters
-params = genParams(ttot=10, tau_on=1, tau_off=1);
-
 % get the simulation fields
 grids = getGridStates();
 growths = getGrowthStates();
 
 % calculate time steps [#]
 nsteps = (params.ttot / params.dt) + 1;
-time = params.dt .* (1:nsteps);
+% time = params.dt .* (1:nsteps);
 
 % initialize the MT grid array with nonexistent grid states
 mt_grid = ones(nsteps, params.init_domains) .* grids.NOTEXIST;
@@ -172,7 +169,7 @@ for si = 1:(nsteps-1)
         elseif curr_state == growths.GROWING
             % chance for catastrophe
             if rand() < (params.f_cat * params.dt)
-                next_state = growths.GROWING;
+                next_state = growths.SHRINKING;
             end
         end
     end
@@ -187,7 +184,7 @@ for si = 1:(nsteps-1)
         mt_length(si+1) = mt_length(si) + (params.vp * params.dt);
     elseif curr_state == growths.SHRINKING
         % decrease the MT length
-        mt_length(si+1) = mt_length(si) - (params.vm * paramd.dt);
+        mt_length(si+1) = mt_length(si) - (params.vm * params.dt);
     else
         % persist MT length
         mt_length(si+1) = mt_length(si);

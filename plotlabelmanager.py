@@ -100,7 +100,7 @@ class PlotLabelManager:
     def get_args(self, key: object) -> dict:
         # prepare the return dict
         plot_label = self.get_plot_label(key)
-        return_dict = plot_label.get_plt_args()
+        return_dict = plot_label.get_plt_args().copy()
         return_dict['label'] = plot_label.get_text()
 
         # deduplicate the label entry for plotting
