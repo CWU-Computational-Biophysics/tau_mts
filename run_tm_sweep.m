@@ -20,7 +20,7 @@ for ratio_val = [1, 5, 10, 50]
         params.tau_off = params.tau_on;
 
         % print progress
-        fprintf("\nStarting simulation %i @ tau/map=%g\n", i, ratio)
+        fprintf("\nStarting simulation %i @ tau_on=%g\n", i, params.tau_on)
 
         % run the simulation
         [mt_grid, mt_length, mt_state, grids, growths] = simTauMap6(params);
