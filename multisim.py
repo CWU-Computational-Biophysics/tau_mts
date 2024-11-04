@@ -8,10 +8,6 @@ from os import PathLike
 from pathlib import Path
 from typing import Iterable
 
-import numpy as np
-import numpy.typing as npt
-import pandas as pd
-
 from rich import print
 
 from simulation import Simulation
@@ -19,7 +15,7 @@ from simulation import Simulation
 
 class MultiSim:
 
-    def __init__(self, mat_files: list[PathLike] = None, file_dir: PathLike = None, color_dict: dict = None, marker_dict: dict = None, skip_check: bool = True):
+    def __init__(self, mat_files: list[PathLike] = None, file_dir: PathLike = None, color_dict: dict = None, marker_dict: dict = None, skip_check: bool = True, sort_by: str = None):
         # check that only one of mat_files and file_dir are None
         if mat_files is None and file_dir is None:
             raise ValueError("Either mat_files or file_dir must be provided, not both")
@@ -33,12 +29,16 @@ class MultiSim:
         self.sim_list = []
 
         # if mat_files is provided, load the files
-        if mat_files is not None:
+        if mat_files:
             self.load_files(mat_files)
 
         # if file_dir is provided, load the files
-        if file_dir is not None:
+        if file_dir:
             self.load_dir(file_dir)
+
+        # if a sorting parameter is provided, call sort by
+        if sort_by:
+            self.sort_by(sort_by)
 
 
     def load_files(self, mat_files: list[PathLike], overwrite: bool = False):
@@ -112,7 +112,7 @@ class MultiSim:
     def sort_by(self, param: str) -> None:
         # check that param is a valid parameter in each simulation
         if not all(param in sim.param_dict for sim in self.get_iter()):
-            print("[red]Error:[/red] param is not a valid parameter")
+            print("[red]Error:[/red] param is not a valid parameter for all simulations")
             return
 
         # sort the sim_list by the parameter
