@@ -131,13 +131,68 @@ class Simulation:
             marker_dict[self.get_grid_type('map6')] = 's'
             self.marker_dict = marker_dict
 
-
         # run sim self check
         if not skip_check:
             print(f"[green]Running self check on '{self.sim_name}'[/green]")
             result = self._sim_self_check()
             if not result:
                 print(f"[red]Warning: Simulation '{self.sim_name}' failed self-check[/red]")
+
+        # calculate final array state parameters
+        self.tau_frac_tip = 0
+        self.tau_frac_length = 0
+        self.tau_plus_end_asym = 0
+        self.map6_frac_tip = 0
+        self.map6_frac_length = 0
+        self.map6_plus_end_asym = 0
+        self._calc_final_array_states()
+
+
+    def _calc_final_array_states(self, final_n: int = 10):
+        # final_n is the number of grid points to be considered as the tip
+        # get the tip array and length array from the last grid
+        trimmed_grid = self.get_trimmed_grid_at(self.get_nsteps()-1)
+
+        # check that the grid contains more than final_n points
+        if len(trimmed_grid) < final_n:
+            print(f"[red]Warning: Final grid at step {self.get_nsteps()-1} has less than {final_n} points. No final array state parameters will be calculated.[/red]")
+
+        # cut the grid into two at end-final_n
+        tip_grid = trimmed_grid[-final_n:]
+        length_grid = trimmed_grid[:-final_n]
+
+        # sum the protein types at each segment
+        tip_tau = np.sum(tip_grid == self.get_grid_type('tau'))
+        tip_map6 = np.sum(tip_grid == self.get_grid_type('map6'))
+        length_tau = np.sum(length_grid == self.get_grid_type('tau'))
+        length_map6 = np.sum(length_grid == self.get_grid_type('map6'))
+
+        # calculate the final binding fraction asymmetry
+        self.tau_frac_tip = tip_tau / len(tip_grid)
+        self.tau_frac_length = length_tau / len(length_grid)
+        self.tau_plus_end_asym = self.tau_frac_tip / self.tau_frac_length
+        self.map6_frac_tip = tip_map6 / len(tip_grid)
+        self.map6_frac_length = length_map6 / len(length_grid)
+        self.map6_plus_end_asym = self.map6_frac_tip / self.map6_frac_length
+
+
+    def get_tau_frac_tip(self) -> float:
+        return self.tau_frac_tip
+
+    def get_tau_frac_length(self) -> float:
+        return self.tau_frac_length
+
+    def get_tau_plus_end_asym(self) -> float:
+        return self.tau_plus_end_asym
+
+    def get_map6_frac_tip(self) -> float:
+        return self.map6_frac_tip
+
+    def get_map6_frac_length(self) -> float:
+        return self.map6_frac_length
+
+    def get_map6_plus_end_asym(self) -> float:
+        return self.map6_plus_end_asym
 
 
     def _gen_trimmed_grids(self) -> list[npt.ArrayLike]:
