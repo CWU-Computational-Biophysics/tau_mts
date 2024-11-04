@@ -117,3 +117,13 @@ class MultiSim:
 
         # sort the sim_list by the parameter
         self.sim_list.sort(key=lambda x: x.get_param(param))
+
+
+    def set_order(self, order: list) -> None:
+        # check that order is the same length as sim_list
+        if len(order) != len(self.sim_list):
+            print("[red]Error:[/red] order is not the same length as sim_list")
+            return
+
+        # sort the sim_list by the order
+        self.sim_list = [sim for _, sim in sorted(zip(order, self.sim_list))]
