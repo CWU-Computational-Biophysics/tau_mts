@@ -11,7 +11,7 @@ validInt = @(x) validScalar(x) && (mod(x, 1) == 0);
 
 % simulation input parameters
 % [second]
-addParameter(input, 'dt', 0.01, validScalar);
+addParameter(input, 'dt', 0.001, validScalar);
 addParameter(input, 'ttot', 1, validScalar);
 
 % constrained input parameters
