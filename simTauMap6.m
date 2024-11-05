@@ -172,9 +172,9 @@ for si = 1:(nsteps-1)
                 next_state = growths.SHRINKING;
             end
         end
+    else
+        next_state = growths.STABLE;
     end
-
-    % update next state
     mt_state(si+1) = next_state;
 
     %% Check for MT growth/shrinking
@@ -224,6 +224,7 @@ for si = 1:(nsteps-1)
 
             % append the NOTEXIST column
             mt_grid = [mt_grid, new_col]; %#ok<AGROW>
+        end
 
         % empty the new grid points at the next step
         mt_grid(si+1, next_step_grid_count:length_based_grid_count) = grids.EMPTY;
@@ -232,7 +233,7 @@ for si = 1:(nsteps-1)
         if params.tau_gating
             mt_grid(si+1, next_step_grid_count:length_based_grid_count) = grids.TAU;
         end
-    elseif diff_gps < 0
+    elseif grid_count_difference < 0
         % removing grid spaces from mt_grid
         % set the diff_gps values to NOTEXIST
         mt_grid(si+1, length_based_grid_count:next_step_grid_count) = grids.NOTEXIST;

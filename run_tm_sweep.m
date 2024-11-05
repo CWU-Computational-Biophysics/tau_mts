@@ -10,7 +10,7 @@ save_dir = fullfile('data', 'tm_sweep');
 
 % iterate over four ratios
 for ratio_val = [1, 5, 10, 50]
-    for i = 1:3
+    for i = 1:5
         % load parameters
         params = genParams(ttot=20, tau_gating=true);
 
