@@ -5,7 +5,7 @@
 clear;
 
 % define the save directory
-save_dir = fullfile('data', 'tm_sweep');
+save_dir = fullfile('data', 'tm_sweep_true');
 [~, ~, ~] = mkdir(save_dir);
 
 % iterate over four ratios
