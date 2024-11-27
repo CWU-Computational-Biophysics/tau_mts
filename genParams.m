@@ -20,22 +20,23 @@ addParameter(input, 'init_domains', 20, validInt);
 addParameter(input, 'alpha_t', 0.0, validScalar);
 addParameter(input, 'alpha_m', 0.0, validScalar);
 % [micrometer]
-addParameter(input, 'dx', 0.036, validScalar);
+addParameter(input, 'dx', 0.024, validScalar);
 % [1 / second]
-addParameter(input, 'f_res', 50, validScalar);
-addParameter(input, 'f_cat', 30, validScalar);
+addParameter(input, 'f_res', 0.03, validScalar);
+addParameter(input, 'f_cat', 0.01, validScalar);
 % [mirometer / second]
-addParameter(input, 'vp', 3.6, validScalar);
-addParameter(input, 'vm', 3.6, validScalar);
+addParameter(input, 'vp', 0.10, validScalar);
+addParameter(input, 'vm', 0.16, validScalar);
 
 % tunable input parameters
 % [logical]
 addParameter(input, 'tau_gating', true, @islogical);
 % [1 / second]
-addParameter(input, 'map6_on', 0.1, validScalar);
 addParameter(input, 'map6_off', 0.1, validScalar);
-addParameter(input, 'tau_on', 0.1, validScalar);
-addParameter(input, 'tau_off', 0.1, validScalar);
+addParameter(input, 'tau_off', 25, validScalar);
+% [1 / (micrometer * second)]
+addParameter(input, 'map6_on', 0.1, validScalar);
+addParameter(input, 'tau_on', 25, validScalar);
 
 % parse inputs and output to struct
 parse(input, varargin{:});

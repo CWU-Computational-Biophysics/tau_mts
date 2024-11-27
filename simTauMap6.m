@@ -15,7 +15,7 @@ if mod(params.ttot, params.dt) ~= 0
 end
 
 % validate that rate*dt < 1 and 0.1
-rate_vector = [params.f_res, params.f_cat, params.map6_on, params.map6_off, params.tau_on, params.tau_off];
+rate_vector = [params.f_res, params.f_cat, params.map6_on * params.dx, params.map6_off, params.tau_on * params.dx, params.tau_off];
 eff_rate_vector = rate_vector .* params.dt;
 if any(eff_rate_vector >= 1)
     error('dt=%g is too high, some rate parameter is >= 1', params.dt)
@@ -99,10 +99,12 @@ for si = 1:(nsteps-1)
         end
 
         % calculate protein effective on/off rates
+        % off rates based on parameter off rate and associativity measure
         tau_off_eff = (params.tau_off - (params.alpha_t * params.tau_off * tau_next)) * params.dt;
         map6_off_eff = (params.map6_off - (params.alpha_m * params.map6_off * map6_next)) * params.dt;
-        tau_on_eff = params.tau_on * params.dt;
-        map6_on_eff = params.map6_on * params.dt;
+        % on rates based on parameter on rate and domain size
+        tau_on_eff = params.tau_on * params.dx * params.dt;
+        map6_on_eff = params.map6_on * params.dx * params.dt;
 
         % get the current protein for occupancy update
         curr_protein = mt_grid(si, gi);

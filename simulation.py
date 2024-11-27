@@ -170,10 +170,17 @@ class Simulation:
         # calculate the final binding fraction asymmetry
         self.tau_frac_tip = tip_tau / len(tip_grid)
         self.tau_frac_length = length_tau / len(length_grid)
-        self.tau_plus_end_asym = self.tau_frac_tip / self.tau_frac_length
         self.map6_frac_tip = tip_map6 / len(tip_grid)
         self.map6_frac_length = length_map6 / len(length_grid)
-        self.map6_plus_end_asym = self.map6_frac_tip / self.map6_frac_length
+
+        # handle divide by 0
+        self.tau_plus_end_asym = 0
+        if self.tau_frac_length != 0:
+            self.tau_plus_end_asym = self.tau_frac_tip / self.tau_frac_length
+
+        self.map6_plus_end_asym = 0
+        if self.map6_frac_length != 0:
+            self.map6_plus_end_asym = self.map6_frac_tip / self.map6_frac_length
 
 
     def get_tau_frac_tip(self) -> float:
