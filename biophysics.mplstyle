@@ -1,6 +1,7 @@
 # font and render options
-font.family         : "serif"
-font.serif          : "Times"
+font.family         : "sans-serif"
+font.sans-serif     : "Arial"
+font.weight         : "bold"
 text.usetex         : True
 text.latex.preamble : \usepackage{amsmath}\usepackage{amssymb}\usepackage{bm}\usepackage{siunitx}\usepackage{esdiff}
 
