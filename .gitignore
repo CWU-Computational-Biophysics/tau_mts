@@ -10,12 +10,8 @@ animate_all_pid.txt
 ### tau_mts ###
 # do not save simulation data
 *data*/
-frames/
-animations/
-figures/
-old_data/
-data50/
-data100/
+*figures*/
+*animations*/
 
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:

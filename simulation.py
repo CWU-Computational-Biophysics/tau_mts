@@ -12,7 +12,7 @@ import h5py
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-# import scipy.io as sio
+import scipy.io as sio
 
 import matplotlib.pyplot as plt
 
@@ -24,13 +24,13 @@ from matplotlib.animation import FuncAnimation
 from rich import print
 from tqdm import tqdm
 
-
 import h5py
 import numpy as np
 
+
 def loadmat_v7_3(filepath, squeeze_me=True, simplify_cells=True):
     """
-    Load MATLAB v7.3 .mat files using h5py with automatic transposition and 
+    Load MATLAB v7.3 .mat files using h5py with automatic transposition and
     conversion of 1x1 arrays to scalars.
 
     Parameters:
@@ -139,12 +139,26 @@ class Simulation:
         #     simplify_cells=True
         # )
 
-        # load the data file with h5py
-        data = loadmat_v7_3(
-            mat_file,
-            squeeze_me=True,
-            simplify_cells=True
-        )
+        # try to load the data file with h5py
+        # fallback to scipy
+        try:
+            data = loadmat_v7_3(
+                mat_file,
+                squeeze_me=True,
+                simplify_cells=True
+            )
+        except OSError:
+            # print(f"[yellow]Warning: Could not load '{mat_file}' with h5py, falling back to scipy[/yellow]")
+            try:
+                data = sio.loadmat(
+                    mat_file,
+                    squeeze_me=True,
+                    simplify_cells=True
+                )
+            except Exception as e:
+                print(f"[red]Error: Could not load '{mat_file}': {e}[/red]")
+                raise e
+
 
         # save the three data sets with lowercase keys for enums
         self.param_dict = data['params']

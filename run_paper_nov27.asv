@@ -11,10 +11,10 @@ runs = 1:5;
 
 % define static params
 dt = 0.01;
-ttot = 10;
+ttot = 1000;
 
 % define data directory
-save_dir = fullfile('paper_data3');
+save_dir = fullfile('paper_data2');
 [~, ~, ~] = mkdir(save_dir);
 
 % define the list of vars to clear after saving data
@@ -184,7 +184,8 @@ for tau_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             % save the simulation
             save_name = sprintf('false_sim_%g_%i.mat', params.tau_on, i);
             save_file = fullfile(false_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
 
             % delete large vars
@@ -232,7 +233,8 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             % save the simulation
             save_name = sprintf('true_sim_%g_%i.mat', params.map6_on, i);
             save_file = fullfile(true_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
 
             % delete large vars
@@ -270,7 +272,8 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             % save the simulation
             save_name = sprintf('false_sim_%g_%i.mat', params.map6_on, i);
             save_file = fullfile(false_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
 
             % delete large vars
@@ -318,7 +321,8 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             % save the simulation
             save_name = sprintf('true_sim_%g_%i.mat', params.map6_on, i);
             save_file = fullfile(true_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
 
             % delete large vars
@@ -356,7 +360,8 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             % save the simulation
             save_name = sprintf('false_sim_%g_%i.mat', params.map6_on, i);
             save_file = fullfile(false_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
 
             % delete large vars

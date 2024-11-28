@@ -11,16 +11,16 @@ runs = 1:5;
 
 % define static params
 dt = 0.01;
-ttot = 10;
+ttot = 1000;
 
 % define data directory
-save_dir = fullfile('paper_data3');
+save_dir = fullfile('paper_data2');
 [~, ~, ~] = mkdir(save_dir);
 
 % define the list of vars to clear after saving data
 clear_vars_list = {'mt_grid', 'mt_length', 'mt_state', 'mt_grids', 'growths'};
 
-
+%{
 % fig 1 data
 % tau_on = vary, tau_off = 25
 % map6_on = 0.25, map6_off = 0.25
@@ -195,7 +195,7 @@ for tau_val = [0.25, 1, 2.5, 5, 10, 20, 25]
         end
     end
 end
-
+%}
 
 % fig 3 data
 % tau_on = 0.25, tau_off = 0.25
