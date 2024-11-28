@@ -7,15 +7,18 @@
 clear;
 
 % define the number of runs for each parameter
-runs = 1:3;
+runs = 1:5;
 
 % define static params
 dt = 0.01;
-ttot = 100;
+ttot = 10;
 
 % define data directory
-save_dir = fullfile('paper_data');
+save_dir = fullfile('paper_data3');
 [~, ~, ~] = mkdir(save_dir);
+
+% define the list of vars to clear after saving data
+clear_vars_list = {'mt_grid', 'mt_length', 'mt_state', 'mt_grids', 'growths'};
 
 
 % fig 1 data
@@ -54,8 +57,12 @@ for tau_val = [25, 50, 100, 200, 250]
             % save the simulation
             save_name = sprintf('true_sim_%g_%i.mat', params.tau_on, i);
             save_file = fullfile(true_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
+
+            % delete large vars
+            clear(clear_vars_list{:})
         catch exception
             warning("Exception, skipping\n")
         end
@@ -89,8 +96,12 @@ for tau_val = [25, 50, 100, 200, 250]
             % save the simulation
             save_name = sprintf('false_sim_%g_%i.mat', params.tau_on, i);
             save_file = fullfile(false_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
+
+            % delete large vars
+            clear(clear_vars_list{:})
         catch exception
             warning("Exception, skipping\n")
         end
@@ -134,8 +145,12 @@ for tau_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             % save the simulation
             save_name = sprintf('true_sim_%g_%i.mat', params.tau_on, i);
             save_file = fullfile(true_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
+
+            % delete large vars
+            clear(clear_vars_list{:})
         catch exception
             warning("Exception, skipping\n")
         end
@@ -169,8 +184,12 @@ for tau_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             % save the simulation
             save_name = sprintf('false_sim_%g_%i.mat', params.tau_on, i);
             save_file = fullfile(false_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
+
+            % delete large vars
+            clear(clear_vars_list{:})
         catch exception
             warning("Exception, skipping\n")
         end
@@ -214,8 +233,12 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             % save the simulation
             save_name = sprintf('true_sim_%g_%i.mat', params.map6_on, i);
             save_file = fullfile(true_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
+
+            % delete large vars
+            clear(clear_vars_list{:})
         catch exception
             warning("Exception, skipping\n")
         end
@@ -249,8 +272,12 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             % save the simulation
             save_name = sprintf('false_sim_%g_%i.mat', params.map6_on, i);
             save_file = fullfile(false_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
+
+            % delete large vars
+            clear(clear_vars_list{:})
         catch exception
             warning("Exception, skipping\n")
         end
@@ -294,8 +321,12 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             % save the simulation
             save_name = sprintf('true_sim_%g_%i.mat', params.map6_on, i);
             save_file = fullfile(true_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
+
+            % delete large vars
+            clear(clear_vars_list{:})
         catch exception
             warning("Exception, skipping\n")
         end
@@ -329,8 +360,12 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             % save the simulation
             save_name = sprintf('false_sim_%g_%i.mat', params.map6_on, i);
             save_file = fullfile(false_dir, save_name);
-            save(save_file, '-nocompression', '-v7');
+            % save(save_file, '-nocompression', '-v7');
+            save(save_file, '-v7.3');
             fprintf("Simulation saved to '%s'\n", save_file);
+
+            % delete large vars
+            clear(clear_vars_list{:})
         catch exception
             warning("Exception, skipping\n")
         end

@@ -8,10 +8,11 @@ from os import PathLike
 from pathlib import Path
 from typing import Callable, Iterator
 
+import h5py
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-import scipy.io as sio
+# import scipy.io as sio
 
 import matplotlib.pyplot as plt
 
@@ -22,6 +23,56 @@ from matplotlib.animation import FuncAnimation
 
 from rich import print
 from tqdm import tqdm
+
+
+import h5py
+import numpy as np
+
+def loadmat_v7_3(filepath, squeeze_me=True, simplify_cells=True):
+    """
+    Load MATLAB v7.3 .mat files using h5py with automatic transposition and 
+    conversion of 1x1 arrays to scalars.
+
+    Parameters:
+        filepath (str): Path to the .mat file.
+        squeeze_me (bool): If True, squeeze unit dimensions from arrays.
+        simplify_cells (bool): If True, convert MATLAB cell arrays to lists.
+
+    Returns:
+        dict: Dictionary containing MATLAB variables.
+    """
+    def mat_to_dict(mat_obj):
+        """Recursively convert MATLAB objects to Python dictionaries/lists."""
+        if isinstance(mat_obj, h5py.Dataset):
+            # Convert datasets to numpy arrays
+            data = mat_obj[()]
+            if data.ndim > 1:  # Transpose multi-dimensional arrays
+                data = data.T
+            if squeeze_me:
+                data = np.squeeze(data)
+            if data.shape == ():  # Convert single-element arrays to scalars
+                data = data.item()
+            return data
+        elif isinstance(mat_obj, h5py.Group):
+            # Convert groups to dictionaries
+            return {key: mat_to_dict(mat_obj[key]) for key in mat_obj.keys()}
+        else:
+            raise TypeError(f"Unsupported MATLAB object type: {type(mat_obj)}")
+
+    def simplify(value):
+        """Simplify MATLAB cells to Python lists."""
+        if isinstance(value, np.ndarray) and value.dtype.kind == 'O':
+            return [simplify(item) for item in value]
+        elif isinstance(value, dict):
+            return {k: simplify(v) for k, v in value.items()}
+        else:
+            return value
+
+    with h5py.File(filepath, 'r') as mat_file:
+        data = {key: mat_to_dict(mat_file[key]) for key in mat_file.keys()}
+        if simplify_cells:
+            data = simplify(data)
+        return data
 
 
 class Sequence:
@@ -82,7 +133,14 @@ class Simulation:
         self.sim_file = mat_file
 
         # load the data file with scipy
-        data = sio.loadmat(
+        # data = sio.loadmat(
+        #     mat_file,
+        #     squeeze_me=True,
+        #     simplify_cells=True
+        # )
+
+        # load the data file with h5py
+        data = loadmat_v7_3(
             mat_file,
             squeeze_me=True,
             simplify_cells=True
@@ -114,6 +172,7 @@ class Simulation:
             self.set_color_dict(color_dict)
         else:
             # create a default color dict
+            # print(self.grid_dict)
             color_dict = {self.get_grid_type(k):None for k in self.grid_dict}
             color_dict[self.get_grid_type('tau')] = 'tab:blue'
             color_dict[self.get_grid_type('map6')] = 'tab:orange'
