@@ -107,7 +107,7 @@ for tau_val = [25, 50, 100, 200, 250]
         end
     end
 end
-
+%}
 
 % fig 2 data
 % tau_on = vary, tau_off = 0.25
@@ -195,8 +195,8 @@ for tau_val = [0.25, 1, 2.5, 5, 10, 20, 25]
         end
     end
 end
-%}
 
+%{
 % fig 3 data
 % tau_on = 0.25, tau_off = 0.25
 % map6_on = vary, map6_off = 0.25
@@ -371,3 +371,4 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
         end
     end
 end
+%}

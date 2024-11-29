@@ -170,7 +170,10 @@ class Simulation:
         self.state_vec = np.array(data['mt_state'])
 
         # save the MT grid
-        self.raw_grid = np.array(data['mt_grid'])
+        try:
+            self.raw_grid = np.array(data['mt_grid'])
+        except KeyError as e:
+            raise KeyError(f"Could not find 'mt_grid' in '{mat_file}'") from e
 
         # calculate and save the number of simulation steps and time vector
         self.nsteps = len(self.length_vec)
