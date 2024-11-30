@@ -198,9 +198,9 @@ for tau_val = [0.25, 1, 2.5, 5, 10, 20, 25]
 end
 %}
 
-%{
+
 % fig 3 data
-% tau_on = 0.25, tau_off = 0.25
+% tau_on = 0.25, tau_off = 25
 % map6_on = vary, map6_off = 0.25
 
 % define fig3 save directory
@@ -220,8 +220,8 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
             ttot=ttot, ...
             dt=dt, ...
             tau_gating=true, ...
-            tau_on=0.25, ...
-            tau_off=0.25, ...
+            tau_on=25, ...
+            tau_off=25, ...
             map6_on=map6_val, ...
             map6_off=0.25);
 
@@ -247,6 +247,7 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
     end
 end
 
+%{
 % false
 false_dir = fullfile(fig3_dir, 'fig3_false');
 [~, ~, ~] = mkdir(false_dir);
@@ -375,6 +376,7 @@ for map6_val = [0.25, 1, 2.5, 5, 10, 20, 25]
 end
 %}
 
+%{
 % fig 5 data
 % tau_on = vary, tau_off = 25
 % map6_on = 0.25, map6_off = 0.25
@@ -461,3 +463,4 @@ for tau_val = [0.25, 1, 2.5, 5, 10, 20, 25]
         end
     end
 end
+%}
