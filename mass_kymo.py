@@ -60,7 +60,7 @@ def kymo_plot(sim: Simulation, save_file: Path):
     # add plot labels
     ax.set_xlabel(r"Position along MT $\left[\qty{}{\micro\meter}\right]$")
     ax.set_ylabel(r"Time $\left[\qty{}{\second}\right]$")
-    ax.set_title(f"Simulation image of ``{sim.get_name()}\'\'")
+    ax.set_title("Simulation `kymograph\'\'")
 
     # add a legend
     handles = [
@@ -73,7 +73,10 @@ def kymo_plot(sim: Simulation, save_file: Path):
 
     # save the figure
     save_file.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(save_file)
+    fig.savefig(save_file, dpi=300, bbox_inches='tight')
+
+    # close the figure
+    plt.close(fig)
 
 
 # given a directory, 'paper_data2', find all .mat files in the directory
@@ -107,8 +110,13 @@ def main():
             sim.get_grid_type('empty'): 'white',
             sim.get_grid_type('notexist'): 'grey',
         })
+
+        # define the save location
+        save_file = Path('paper_figures') / parent.parts[-1] / f'sim_kymo_{name}.pdf'
+        # print(save_file)
+
         # generate the kymograph
-        kymo_plot(sim, parent / f"sim_kymo_{name}.pdf")
+        kymo_plot(sim, save_file)
 
 
 if __name__ == '__main__':

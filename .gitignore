@@ -12,6 +12,7 @@ animate_all_pid.txt
 *data*/
 *figures*/
 *animations*/
+tmp/
 
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:
